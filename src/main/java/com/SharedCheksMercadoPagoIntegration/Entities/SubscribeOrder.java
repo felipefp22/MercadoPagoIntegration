@@ -1,6 +1,9 @@
 package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.DTOs.ItemsDTO;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.DTOs.PayerDTO;
+import com.fasterxml.jackson.databind.util.EnumValues;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +29,15 @@ public class SubscribeOrder {
     private KindOfSubscription kindOfSubscription;
 
     // <>---------------- Constructors ----------------<>
-
+    public SubscribeOrder() {
+    }
+    public SubscribeOrder(PayerDTO payerDTO, ItemsDTO itemsDTO) {
+        this.emailProfileID = payerDTO.email();
+        this.status = "";
+        this.createdAt = LocalDateTime.now();
+        this.value = itemsDTO.unit_price();
+        this.kindOfSubscription = KindOfSubscription.valueOf(itemsDTO.title());
+    }
 
 
     // <>---------------- GETTERS and SETTERS ----------------<>

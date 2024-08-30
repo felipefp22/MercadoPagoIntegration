@@ -1,12 +1,13 @@
 package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.DTOs;
 
-import jakarta.persistence.Entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
-public record MpagoOrderDTO(
+public record PreferenceDTO(
         String external_reference,
+        Boolean expires,
+        LocalDateTime expiration_date_to,
         List<ItemsDTO> items,
         //String notification_url,
         PayerDTO payer

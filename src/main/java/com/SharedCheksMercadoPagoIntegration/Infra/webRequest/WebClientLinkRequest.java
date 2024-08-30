@@ -18,7 +18,7 @@ import java.util.Map;
 @Component
 public class WebClientLinkRequest {
     private static LoginOnMP loginOnMP;
-    private static String tokenOnWitsis;
+    private static String tokenOnMP;
     private static WebClient webClient;
 
     public WebClientLinkRequest(LoginOnMP loginOnMP) {
@@ -49,7 +49,7 @@ public class WebClientLinkRequest {
                         if (headers != null) {
                             headers.forEach(httpHeaders::add);
                         }
-                        httpHeaders.add("Authorization", tokenOnWitsis);
+                        httpHeaders.add("Authorization", tokenOnMP);
                     })
                     .body(requestBody != null ? BodyInserters.fromValue(requestBody) : null)
                     .retrieve()
@@ -59,9 +59,10 @@ public class WebClientLinkRequest {
         } catch (WebClientException e) {
             if (e instanceof WebClientResponseException && remainingRetries > 0) {
                 WebClientResponseException ex = (WebClientResponseException) e;
-                if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED) || ex.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
+                if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED) || ex.getStatusCode().equals(HttpStatus.FORBIDDEN)
+                        || ex.getStatusCode().equals(HttpStatus.valueOf(503))) {
                     // Call your login method here
-                    loginOnWitsis();
+                    loginOnMP();
                     // Retry the request
                     return retryRequest(uri, httpMethod, requestBody, responseType, headers,remainingRetries - 1);
                 }
@@ -70,12 +71,12 @@ public class WebClientLinkRequest {
         }
     }
 
-    public static void loginOnWitsis() {
+    public static void loginOnMP() {
         var requisitionPath = ("/oauth/token");
 
         var responseOfWitsis =
                 requisitionGeneric(requisitionPath, HttpMethod.POST, loginOnMP,new ParameterizedTypeReference<LoginDataResponseDTO>() {},null);
 
-        tokenOnWitsis = (responseOfWitsis.token_type() + " " + responseOfWitsis.access_token());
+        tokenOnMP = (responseOfWitsis.token_type() + " " + responseOfWitsis.access_token());
     }
 }

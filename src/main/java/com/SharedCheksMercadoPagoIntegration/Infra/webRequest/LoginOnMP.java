@@ -5,29 +5,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoginOnMP {
-//    @Value("${.username}")
-//    private String username;
-//
-//    @Value("${.password}")
-//    private String password;
 
-    @Value("${mp.clientId}")
+    @Value("${mp.client.id}")
     private String client_id;
 
-    @Value("${mp.clientSecret}")
+    @Value("${mp.client.secret}")
     private String client_secret;
+
+    private String grant_type = "client_credentials";
 
     @Value("${mp.url}")
     private String url;
 
     // <>---|Getters|---<>
-//    public String getUsername() {
-//        return username;
-//    }
-//
-//    public String getPassword() {
-//        return password;
-//    }
 
     public String getClient_id() {
         return client_id;
@@ -35,6 +25,10 @@ public class LoginOnMP {
 
     public String getClient_secret() {
         return client_secret;
+    }
+
+    public String getGrant_type() {
+        return grant_type;
     }
 
     public String getUrl() {
