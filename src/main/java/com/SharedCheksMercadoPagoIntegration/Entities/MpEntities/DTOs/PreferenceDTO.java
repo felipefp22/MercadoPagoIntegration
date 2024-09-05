@@ -10,7 +10,8 @@ public record PreferenceDTO(
         LocalDateTime expiration_date_to,
         List<ItemsDTO> items,
         //String notification_url,
-        PayerDTO payer
+        PayerDTO payer,
+        PaymentMethods payment_methods
 ) {
 
 

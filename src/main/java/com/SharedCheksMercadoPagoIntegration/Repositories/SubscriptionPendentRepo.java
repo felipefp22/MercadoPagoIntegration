@@ -4,9 +4,11 @@ import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface SubscribeOrderRepo extends JpaRepository<SubscribeOrder, UUID> {
+public interface SubscriptionPendentRepo extends JpaRepository<SubscribeOrder, UUID> {
 
+    List<SubscribeOrder> findByEmail(String email);
 }

@@ -27,6 +27,7 @@ public class SubscribeOrder {
 
     private Double value;
     private KindOfSubscription kindOfSubscription;
+    private String ticketUsed;
 
     // <>---------------- Constructors ----------------<>
     public SubscribeOrder() {
