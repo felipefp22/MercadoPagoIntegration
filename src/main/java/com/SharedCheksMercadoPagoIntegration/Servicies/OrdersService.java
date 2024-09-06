@@ -8,6 +8,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientException;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,11 +33,15 @@ public class OrdersService {
             List<ExcludedPaymentMethods> excludedPaymentMethods =
                     List.of("bolbradesco", "pec").stream().map(ExcludedPaymentMethods::new).toList();
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
             PreferenceDTO preferenceDTO = new PreferenceDTO(
+                    new BackUrlsDTO("www.google.com.br", "www.google.com.br", "www.google.com.br"),
                     UUID.randomUUID().toString(),
-                    false,
-                    null,
+                    true,
+                    ZonedDateTime.of(LocalDateTime.now(ZoneOffset.UTC).plusDays(1), ZoneOffset.UTC).format(formatter),
                     List.of(itemsDTO),
+                    "https://0e44-2603-8000-6d01-e38a-cc9e-d968-a165-3c3a.ngrok-free.app/webhook-receives/mp-payments",
                     payerDTO,
                     new PaymentMethods(excludedPaymentMethods)
             );

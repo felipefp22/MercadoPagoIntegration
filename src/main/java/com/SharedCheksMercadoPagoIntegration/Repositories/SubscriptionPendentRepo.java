@@ -10,5 +10,5 @@ import java.util.UUID;
 @Repository
 public interface SubscriptionPendentRepo extends JpaRepository<SubscribeOrder, UUID> {
 
-    List<SubscribeOrder> findByEmail(String email);
+    List<SubscribeOrder> findByEmailProfileID(String email);
 }

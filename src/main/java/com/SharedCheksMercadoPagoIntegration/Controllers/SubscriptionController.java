@@ -15,13 +15,13 @@ public class SubscriptionController {
 
     // <>-------------- Methods --------------<>
 
-    @GetMapping("/verify-if-have-active-subscription/{email}")
-    public String verifyIfHaveActiveSubscription(@PathVariable String email) {
-        List<SubscribeOrder> subscriptionPaidRepo = subscriptionPendentRepo.findByEmail(email);
-
-
-        return ;
-    }
+//    @GetMapping("/verify-if-have-active-subscription/{email}")
+//    public String verifyIfHaveActiveSubscription(@PathVariable String email) {
+//        List<SubscribeOrder> subscriptionPaidRepo = subscriptionPendentRepo.findByEmail(email);
+//
+//
+//        return ;
+//    }
 
 
 }

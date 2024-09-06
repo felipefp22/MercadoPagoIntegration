@@ -21,13 +21,13 @@ public class SubscriptionService {
 
     // <>-------------- Methods --------------<>
 
-    public String verifyIfHaveActiveSubscription(String email) {
-        verifyWithMpIfHadPayment();
-
-        List<SubscribeOrder> subscriptionPaidRepo = subscriptionPendentRepo.findByEmail(email);
-
-        return;
-    }
+//    public String verifyIfHaveActiveSubscription(String email) {
+//        verifyWithMpIfHadPayment();
+//
+//        List<SubscribeOrder> subscriptionPaidRepo = subscriptionPendentRepo.findByEmail(email);
+//
+//        return;
+//    }
 
     // <>-------------- Aux Methods --------------<>
     @Scheduled(fixedDelay = 10000)

@@ -29,6 +29,8 @@ public class SubscribeOrder {
     private KindOfSubscription kindOfSubscription;
     private String ticketUsed;
 
+    private String mercadoPagoID;
+
     // <>---------------- Constructors ----------------<>
     public SubscribeOrder() {
     }
@@ -83,6 +85,13 @@ public class SubscribeOrder {
 
     public KindOfSubscription getKindOfSubscription() {
         return kindOfSubscription;
+    }
+
+    public String getMercadoPagoID() {
+        return mercadoPagoID;
+    }
+    public void setMercadoPagoID(String mercadoPagoID) {
+        this.mercadoPagoID = mercadoPagoID;
     }
 }
 
