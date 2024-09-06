@@ -2,11 +2,9 @@ package com.SharedCheksMercadoPagoIntegration.Controllers;
 
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.DTOs.PayerDTO;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import com.SharedCheksMercadoPagoIntegration.Servicies.OrdersService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController

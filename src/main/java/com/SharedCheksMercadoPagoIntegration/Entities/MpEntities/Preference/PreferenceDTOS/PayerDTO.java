@@ -1,4 +1,4 @@
-package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.DTOs;
+package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS;
 
 public record PayerDTO(
         Integer id,

@@ -1,9 +1,8 @@
 package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.DTOs.ItemsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.DTOs.PayerDTO;
-import com.fasterxml.jackson.databind.util.EnumValues;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

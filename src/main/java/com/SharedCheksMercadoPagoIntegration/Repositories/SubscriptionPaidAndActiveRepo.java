@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface SubscriptionPaidRepo extends JpaRepository<SubscribeOrder, UUID> {
+public interface SubscriptionPaidAndActiveRepo extends JpaRepository<SubscribeOrder, UUID> {
 
     List<SubscribeOrder> findByEmailProfileID(String email);
 }
