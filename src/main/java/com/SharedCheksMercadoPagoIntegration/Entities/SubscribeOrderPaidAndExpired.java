@@ -4,10 +4,7 @@ import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrder;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,7 +13,6 @@ import java.util.UUID;
 public class SubscribeOrderPaidAndExpired {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID orderID;
 
     private String emailProfileID;
@@ -30,17 +26,24 @@ public class SubscribeOrderPaidAndExpired {
     private String ticketUsed;
 
     private String mercadoPagoID;
-    //private MerchantOrder merchantOrder;
+
+    @OneToOne
+    private MerchantOrder merchantOrder;
 
     // <>---------------- Constructors ----------------<>
     public SubscribeOrderPaidAndExpired() {
     }
-    public SubscribeOrderPaidAndExpired(PayerDTO payerDTO, ItemsDTO itemsDTO) {
-        this.emailProfileID = payerDTO.email();
-        this.status = "";
-        this.createdAt = LocalDateTime.now();
-        this.value = itemsDTO.unit_price();
-        this.kindOfSubscription = KindOfSubscription.valueOf(itemsDTO.title());
+    public SubscribeOrderPaidAndExpired(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive){
+        this.orderID = subscribeOrderPaidAndActive.getOrderID();
+        this.emailProfileID = subscribeOrderPaidAndActive.getEmailProfileID();
+        this.status = subscribeOrderPaidAndActive.getStatus();
+        this.createdAt = subscribeOrderPaidAndActive.getCreatedAt();
+        this.paidAt = LocalDateTime.now();
+        this.validTill = subscribeOrderPaidAndActive.getValidTill();
+        this.value = subscribeOrderPaidAndActive.getValue();
+        this.kindOfSubscription = subscribeOrderPaidAndActive.getKindOfSubscription();
+        this.mercadoPagoID = subscribeOrderPaidAndActive.getMercadoPagoID();
+        this.merchantOrder = subscribeOrderPaidAndActive.getMerchantOrder();
     }
 
 
@@ -94,12 +97,5 @@ public class SubscribeOrderPaidAndExpired {
     public void setMercadoPagoID(String mercadoPagoID) {
         this.mercadoPagoID = mercadoPagoID;
     }
-
-//    public MerchantOrder getMerchantOrder() {
-//        return merchantOrder;
-//    }
-//    public void setMerchantOrder(MerchantOrder merchantOrder) {
-//        this.merchantOrder = merchantOrder;
-//    }
 }
 

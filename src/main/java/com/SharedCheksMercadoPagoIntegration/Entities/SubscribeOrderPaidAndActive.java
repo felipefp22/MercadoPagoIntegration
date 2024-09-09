@@ -2,12 +2,10 @@ package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrder;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrderDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,7 +14,6 @@ import java.util.UUID;
 public class SubscribeOrderPaidAndActive {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID orderID;
 
     private String emailProfileID;
@@ -30,17 +27,22 @@ public class SubscribeOrderPaidAndActive {
     private String ticketUsed;
 
     private String mercadoPagoID;
-    //private MerchantOrder merchantOrder;
+    @OneToOne
+    private MerchantOrder merchantOrder;
 
     // <>---------------- Constructors ----------------<>
     public SubscribeOrderPaidAndActive() {
     }
-    public SubscribeOrderPaidAndActive(PayerDTO payerDTO, ItemsDTO itemsDTO) {
-        this.emailProfileID = payerDTO.email();
-        this.status = "";
-        this.createdAt = LocalDateTime.now();
-        this.value = itemsDTO.unit_price();
-        this.kindOfSubscription = KindOfSubscription.valueOf(itemsDTO.title());
+    public SubscribeOrderPaidAndActive(SubscribeOrderPendind subscribeOrderPendind){
+        this.orderID = subscribeOrderPendind.getOrderID();
+        this.emailProfileID = subscribeOrderPendind.getEmailProfileID();
+        this.status = subscribeOrderPendind.getStatus();
+        this.createdAt = subscribeOrderPendind.getCreatedAt();
+        this.paidAt = LocalDateTime.now();
+        this.validTill = subscribeOrderPendind.getValidTill();
+        this.value = subscribeOrderPendind.getValue();
+        this.kindOfSubscription = subscribeOrderPendind.getKindOfSubscription();
+        this.mercadoPagoID = subscribeOrderPendind.getMercadoPagoID();
     }
 
 
@@ -95,11 +97,11 @@ public class SubscribeOrderPaidAndActive {
         this.mercadoPagoID = mercadoPagoID;
     }
 
-//    public MerchantOrder getMerchantOrder() {
-//        return merchantOrder;
-//    }
-//    public void setMerchantOrder(MerchantOrder merchantOrder) {
-//        this.merchantOrder = merchantOrder;
-//    }
+    public MerchantOrder getMerchantOrder() {
+        return merchantOrder;
+    }
+    public void setMerchantOrderFromDTO(MerchantOrderDTO merchantOrderDTO) {
+        this.merchantOrder = new MerchantOrder(merchantOrderDTO);
+    }
 }
 

@@ -5,6 +5,6 @@ import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.
 import java.util.List;
 
 public record MerchantOrdersThroughElementsDTO(
-        List<MerchantOrder> elements
+        List<MerchantOrderDTO> elements
 ) {
 }

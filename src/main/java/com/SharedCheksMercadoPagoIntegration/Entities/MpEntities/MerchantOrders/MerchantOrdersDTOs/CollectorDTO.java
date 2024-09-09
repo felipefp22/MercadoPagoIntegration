@@ -1,7 +1,7 @@
 package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs;
 
 public record CollectorDTO(
-        Integer id,
+        Long id,
         String email,
         String nickname
 ) {

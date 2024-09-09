@@ -1,7 +1,6 @@
 package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrder;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import jakarta.persistence.Entity;
@@ -13,10 +12,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-public class SubscribeOrder {
+public class SubscribeOrderPendind {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID orderID;
 
     private String emailProfileID;
@@ -32,9 +30,10 @@ public class SubscribeOrder {
     private String mercadoPagoID;
 
     // <>---------------- Constructors ----------------<>
-    public SubscribeOrder() {
+    public SubscribeOrderPendind() {
     }
-    public SubscribeOrder(PayerDTO payerDTO, ItemsDTO itemsDTO) {
+    public SubscribeOrderPendind(PayerDTO payerDTO, ItemsDTO itemsDTO) {
+        this.orderID = UUID.randomUUID();
         this.emailProfileID = payerDTO.email();
         this.status = "";
         this.createdAt = LocalDateTime.now();

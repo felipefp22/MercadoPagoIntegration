@@ -1,8 +1,11 @@
 package com.SharedCheksMercadoPagoIntegration.Servicies;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrder;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrderDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrdersThroughElementsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrder;
+import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPaidAndActive;
+import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPaidAndExpired;
+import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPaidAndActiveRepo;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPaidAndExpiredRepo;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendentRepo;
@@ -35,7 +38,7 @@ public class SubscriptionService {
     public String verifyIfHaveActiveSubscription(String email) {
         verifyWithMpIfHadNewPayment();
 
-        SubscribeOrder subscriptionActive = subscriptionPaidAndActiveRepo.findByEmailProfileID(email)
+        SubscribeOrderPaidAndActive subscriptionActive = subscriptionPaidAndActiveRepo.findByEmailProfileID(email)
                 .stream().findFirst().orElse(null);
 
         if (subscriptionActive != null && subscriptionActive.getValidTill().isAfter(LocalDateTime.now())) {
@@ -44,7 +47,7 @@ public class SubscriptionService {
 
             return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
         } else {
-            SubscribeOrder subscriptionPending = subscriptionPendentRepo.findByEmailProfileID(email)
+            SubscribeOrderPendind subscriptionPending = subscriptionPendentRepo.findByEmailProfileID(email)
                     .stream().findFirst().orElseThrow(() -> new RuntimeException("No subscription found"));
 
             var externalReference = subscriptionPending.getOrderID();
@@ -55,16 +58,16 @@ public class SubscriptionService {
                             new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
                             }, null);
 
-            MerchantOrder merchantOrder = merchantOrderElements.elements().stream().findFirst().orElse(null);
-
-            if (merchantOrder.getPayments().stream().findFirst().orElse(null).status().equals("approved")) {
-                // Move pending subscription to paid and activate subscription
-                movePendingSubscriptionToPaidAndActivateSubscription(subscriptionPending, merchantOrder);
-
-                return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
-            } else {
+//            MerchantOrder merchantOrder = merchantOrderElements.elements().stream().findFirst().orElse(null);
+//
+//            if (merchantOrder.getPayments().stream().findFirst().orElse(null).status().equals("approved")) {
+//                // Move pending subscription to paid and activate subscription
+//                movePendingSubscriptionToPaidAndActivateSubscription(subscriptionPending, merchantOrder);
+//
+//                return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
+//            } else {
                 return "No subscription found";
-            }
+//            }
         }
     }
 
@@ -72,25 +75,27 @@ public class SubscriptionService {
 
 
     @Transactional
-    private void movePendingSubscriptionToPaidAndActivateSubscription(SubscribeOrder subscribeOrderPendingToChange,
-                                                                      MerchantOrder merchantOrder) {
+    private void movePendingSubscriptionToPaidAndActivateSubscription(SubscribeOrderPendind subscribeOrderPendindPendingToChange,
+                                                                      MerchantOrderDTO merchantOrderDTO) {
 
-        subscribeOrderPendingToChange.setStatus("PAID");
-        subscribeOrderPendingToChange.setPaidAt(
-                LocalDateTime.parse(merchantOrder.getPayments().stream().findFirst().orElse(null).date_approved()));
-        subscribeOrderPendingToChange.setValidTill(
-                LocalDateTime.parse(merchantOrder.getPayments().stream().findFirst().orElse(null).date_approved())
-                        .plusDays(subscribeOrderPendingToChange.getKindOfSubscription().getDays()));
-        //subscribeOrderPendingToChange.setMerchantOrder(merchantOrder);
+        subscribeOrderPendindPendingToChange.setStatus("PAID");
+        subscribeOrderPendindPendingToChange.setPaidAt(
+                LocalDateTime.parse(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
+        subscribeOrderPendindPendingToChange.setValidTill(
+                LocalDateTime.parse(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
+                        .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
 
-        var subscribeOrderToActivate = subscriptionPaidAndActiveRepo.save(subscribeOrderPendingToChange);
-        subscriptionPendentRepo.deleteById(subscribeOrderPendingToChange.getOrderID());
+        var subscribeOrderPaidAndActiveToSave = new SubscribeOrderPaidAndActive(subscribeOrderPendindPendingToChange);
+        subscribeOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
+
+        SubscribeOrderPaidAndActive subscribeOrderToActivate = subscriptionPaidAndActiveRepo.save(subscribeOrderPaidAndActiveToSave);
+        subscriptionPendentRepo.deleteById(subscribeOrderToActivate.getOrderID());
 
         // Activate User subscription in main API
         activateSubscriptionForUserMainAPI(subscribeOrderToActivate);
     }
 
-    private void activateSubscriptionForUserMainAPI(SubscribeOrder subscribeOrder) {
+    private void activateSubscriptionForUserMainAPI(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive) {
 
         requisitionGeneric("",
                 HttpMethod.POST, null,
@@ -101,7 +106,7 @@ public class SubscriptionService {
     // <>-------------- Routines --------------<>
     @Scheduled(fixedDelay = 6000000)
     public void verifyWithMpIfHadNewPayment() {
-        List<SubscribeOrder> subscriptionsPendind = subscriptionPendentRepo.findAll();
+        List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendentRepo.findAll();
 
         subscriptionsPendind.forEach(x -> {
             MerchantOrdersThroughElementsDTO merchantOrderElements =
@@ -110,10 +115,12 @@ public class SubscriptionService {
                             new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
                             }, null);
 
-            MerchantOrder merchantOrder = merchantOrderElements.elements().stream().findFirst().orElse(null);
+            System.out.println(merchantOrderElements);
 
-            if (merchantOrder.getPayments().stream().findFirst().orElse(null).status().equals("approved")) {
-                movePendingSubscriptionToPaidAndActivateSubscription(x, merchantOrder);
+            MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
+
+            if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
+                movePendingSubscriptionToPaidAndActivateSubscription(x, merchantOrderDTO);
             }
         });
     }
@@ -122,13 +129,13 @@ public class SubscriptionService {
     @Scheduled(fixedDelay = 21600000)
     @Transactional
     public void takingOutExpiredSubscriptions() {
-        List<SubscribeOrder> subscriptionPaidRepo = subscriptionPaidAndActiveRepo.findAll();
+        List<SubscribeOrderPaidAndActive> subscriptionPaidRepo = subscriptionPaidAndActiveRepo.findAll();
 
         subscriptionPaidRepo.forEach(x -> {
             if (x.getValidTill().isBefore(LocalDateTime.now())) {
                 x.setStatus("PAIDANDEXPIRED");
-                subscriptionPaidAndExpiredRepo.save(x);
-                subscriptionPaidAndActiveRepo.deleteById(x.getOrderID());
+                var subscriptionPaidAndEcpiredSaved = subscriptionPaidAndExpiredRepo.save(new SubscribeOrderPaidAndExpired(x));
+                subscriptionPaidAndActiveRepo.deleteById(subscriptionPaidAndEcpiredSaved.getOrderID());
 
                 // Deactivate User subscription in main API
                 requisitionGeneric("",
@@ -137,7 +144,5 @@ public class SubscriptionService {
                         }, null);
             }
         });
-
     }
-
 }

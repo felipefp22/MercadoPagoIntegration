@@ -2,7 +2,7 @@ package com.SharedCheksMercadoPagoIntegration.Servicies;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.Preference;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.*;
-import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrder;
+import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendentRepo;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -14,7 +14,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequest.requisitionGeneric;
 
@@ -29,7 +28,7 @@ public class OrdersService {
     // <>-------------- Methods --------------<>
     public Object createOrder(PayerDTO payerDTO, ItemsDTO itemsDTO) {
         try {
-            SubscribeOrder subscribeOrder = new SubscribeOrder(payerDTO, itemsDTO);
+            SubscribeOrderPendind subscribeOrderPendind = new SubscribeOrderPendind(payerDTO, itemsDTO);
             List<ExcludedPaymentMethods> excludedPaymentMethods =
                     List.of("bolbradesco", "pec").stream().map(ExcludedPaymentMethods::new).toList();
 
@@ -37,7 +36,7 @@ public class OrdersService {
 
             Preference preference = new Preference(
                     new BackUrlsDTO("www.google.com.br", "www.google.com.br", "www.google.com.br"),
-                    UUID.randomUUID().toString(),
+                    subscribeOrderPendind.getOrderID().toString(),
                     true,
                     ZonedDateTime.of(LocalDateTime.now(ZoneOffset.UTC).plusDays(1), ZoneOffset.UTC).format(formatter),
                     List.of(itemsDTO),
@@ -52,8 +51,8 @@ public class OrdersService {
                     }, null);
 
             //precisa revisar isso aqui
-            subscribeOrder.setStatus("CREATED");
-            subscriptionPendentRepo.save(subscribeOrder);
+            subscribeOrderPendind.setStatus("CREATED");
+            subscriptionPendentRepo.save(subscribeOrderPendind);
 
             return returnOfMP;
 

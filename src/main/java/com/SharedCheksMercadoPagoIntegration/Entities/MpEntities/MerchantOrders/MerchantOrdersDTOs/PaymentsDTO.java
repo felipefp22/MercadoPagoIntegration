@@ -1,7 +1,7 @@
 package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs;
 
 public record PaymentsDTO(
-        String id,
+        Long id,
         Double transaction_amount,
         Double total_paid_amount,
         Double shipping_cost,
