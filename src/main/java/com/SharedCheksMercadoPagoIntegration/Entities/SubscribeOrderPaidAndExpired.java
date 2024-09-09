@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-public class SubscribeOrder {
+public class SubscribeOrderPaidAndExpired {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,11 +30,12 @@ public class SubscribeOrder {
     private String ticketUsed;
 
     private String mercadoPagoID;
+    //private MerchantOrder merchantOrder;
 
     // <>---------------- Constructors ----------------<>
-    public SubscribeOrder() {
+    public SubscribeOrderPaidAndExpired() {
     }
-    public SubscribeOrder(PayerDTO payerDTO, ItemsDTO itemsDTO) {
+    public SubscribeOrderPaidAndExpired(PayerDTO payerDTO, ItemsDTO itemsDTO) {
         this.emailProfileID = payerDTO.email();
         this.status = "";
         this.createdAt = LocalDateTime.now();
@@ -93,5 +94,12 @@ public class SubscribeOrder {
     public void setMercadoPagoID(String mercadoPagoID) {
         this.mercadoPagoID = mercadoPagoID;
     }
+
+//    public MerchantOrder getMerchantOrder() {
+//        return merchantOrder;
+//    }
+//    public void setMerchantOrder(MerchantOrder merchantOrder) {
+//        this.merchantOrder = merchantOrder;
+//    }
 }
 

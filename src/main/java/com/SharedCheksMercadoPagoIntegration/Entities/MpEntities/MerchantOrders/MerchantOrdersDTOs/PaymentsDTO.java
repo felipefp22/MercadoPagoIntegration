@@ -6,9 +6,12 @@ public record PaymentsDTO(
         Double total_paid_amount,
         Double shipping_cost,
         String status,
+        String status_detail,
+        String operation_type,
         String date_approved,
         String date_created,
-        String date_modified
+        String last_modified,
+        String amount_refunded
 
 ) {
 }

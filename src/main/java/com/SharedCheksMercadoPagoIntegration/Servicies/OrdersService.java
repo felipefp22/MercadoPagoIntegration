@@ -43,7 +43,8 @@ public class OrdersService {
                     List.of(itemsDTO),
                     "https://0e44-2603-8000-6d01-e38a-cc9e-d968-a165-3c3a.ngrok-free.app/webhook-receives/mp-payments",
                     payerDTO,
-                    new PaymentMethods(excludedPaymentMethods)
+                    new PaymentMethods(excludedPaymentMethods),
+                    1
             );
 
             Object returnOfMP = requisitionGeneric("/checkout/preferences", HttpMethod.POST, preference,

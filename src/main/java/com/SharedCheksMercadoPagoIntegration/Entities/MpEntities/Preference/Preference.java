@@ -16,7 +16,8 @@ public record Preference(
         List<ItemsDTO> items,
         String notification_url,
         PayerDTO payer,
-        PaymentMethods payment_methods
+        PaymentMethods payment_methods,
+        Integer installments
 ) {
 
 
