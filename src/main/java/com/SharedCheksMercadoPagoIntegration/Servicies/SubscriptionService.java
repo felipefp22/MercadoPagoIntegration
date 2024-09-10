@@ -84,9 +84,9 @@ public class SubscriptionService {
 
         subscribeOrderPaidAndActiveToSave.setStatus("PAID");
         subscribeOrderPaidAndActiveToSave.setPaidAtUTC(
-                takeUtcLocalDateTimeDatePayApproved(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
+                takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
         subscribeOrderPaidAndActiveToSave.setValidTillUTC(
-                takeUtcLocalDateTimeDatePayApproved(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
+                takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
                 .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
 
         subscribeOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
@@ -107,7 +107,7 @@ public class SubscriptionService {
                 }, null);
     }
 
-    private LocalDateTime takeUtcLocalDateTimeDatePayApproved(String dateApprovedString) {
+    private LocalDateTime takeLocalDateTimeDatePayApprovedUTC(String dateApprovedString) {
         ZonedDateTime zonedDateTimeDatePayApproved = ZonedDateTime.parse(dateApprovedString);
 
         ZonedDateTime utcZonedDateTimeDatePayApproved = zonedDateTimeDatePayApproved.withZoneSameInstant(ZoneId.of("UTC"));
@@ -144,14 +144,14 @@ public class SubscriptionService {
         subscriptionPaidRepo.forEach(x -> {
             if (x.getValidTillUTC().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
                 x.setStatus("PAIDANDEXPIRED");
-                var subscriptionPaidAndEcpiredSaved = subscriptionPaidAndExpiredRepo.save(new SubscribeOrderPaidAndExpired(x));
-                subscriptionPaidAndActiveRepo.deleteById(subscriptionPaidAndEcpiredSaved.getOrderID());
+                var subscriptionPaidAndExpiredSaved = subscriptionPaidAndExpiredRepo.save(new SubscribeOrderPaidAndExpired(x));
+                subscriptionPaidAndActiveRepo.deleteById(subscriptionPaidAndExpiredSaved.getOrderID());
 
                 // Deactivate User subscription in main API
-                requisitionGenericMP("",
-                        HttpMethod.DELETE, null,
-                        new ParameterizedTypeReference<Object>() {
-                        }, null);
+//                requisitionGenericSharedChecks("",
+//                        HttpMethod.DELETE, null,
+//                        new ParameterizedTypeReference<Object>() {
+//                        }, null);
             }
         });
     }
