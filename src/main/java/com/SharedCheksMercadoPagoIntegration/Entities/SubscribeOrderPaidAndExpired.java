@@ -27,7 +27,7 @@ public class SubscribeOrderPaidAndExpired {
 
     private String mercadoPagoID;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private MerchantOrder merchantOrder;
 
     // <>---------------- Constructors ----------------<>

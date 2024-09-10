@@ -1,6 +1,5 @@
 package com.SharedCheksMercadoPagoIntegration.Servicies;
 
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrder;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrderDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrdersThroughElementsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPaidAndActive;
@@ -16,9 +15,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
-import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequest.requisitionGeneric;
+import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequestMP.requisitionGenericMP;
+import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequestSharedChecks.requisitionGenericSharedChecks;
 
 @Service
 public class SubscriptionService {
@@ -53,7 +55,7 @@ public class SubscriptionService {
             var externalReference = subscriptionPending.getOrderID();
 
             MerchantOrdersThroughElementsDTO merchantOrderElements =
-                    requisitionGeneric("/merchant_orders/search?external_reference=" + externalReference.toString()
+                    requisitionGenericMP("/merchant_orders/search?external_reference=" + externalReference.toString()
                             , HttpMethod.GET, null,
                             new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
                             }, null);
@@ -66,7 +68,7 @@ public class SubscriptionService {
 //
 //                return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
 //            } else {
-                return "No subscription found";
+            return "No subscription found";
 //            }
         }
     }
@@ -80,10 +82,10 @@ public class SubscriptionService {
 
         subscribeOrderPendindPendingToChange.setStatus("PAID");
         subscribeOrderPendindPendingToChange.setPaidAt(
-                LocalDateTime.parse(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
+                takeUtcLocalDateTimeDatePayApproved(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
         subscribeOrderPendindPendingToChange.setValidTill(
-                LocalDateTime.parse(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
-                        .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
+                takeUtcLocalDateTimeDatePayApproved(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
+                .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
 
         var subscribeOrderPaidAndActiveToSave = new SubscribeOrderPaidAndActive(subscribeOrderPendindPendingToChange);
         subscribeOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
@@ -97,10 +99,17 @@ public class SubscriptionService {
 
     private void activateSubscriptionForUserMainAPI(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive) {
 
-        requisitionGeneric("",
+        requisitionGenericSharedChecks("",
                 HttpMethod.POST, null,
                 new ParameterizedTypeReference<Object>() {
                 }, null);
+    }
+
+    private LocalDateTime takeUtcLocalDateTimeDatePayApproved(String dateApprovedString) {
+        ZonedDateTime zonedDateTimeDatePayApproved = ZonedDateTime.parse(dateApprovedString);
+
+        ZonedDateTime utcZonedDateTimeDatePayApproved = zonedDateTimeDatePayApproved.withZoneSameInstant(ZoneId.of("UTC"));
+        return utcZonedDateTimeDatePayApproved.toLocalDateTime();
     }
 
     // <>-------------- Routines --------------<>
@@ -110,12 +119,10 @@ public class SubscriptionService {
 
         subscriptionsPendind.forEach(x -> {
             MerchantOrdersThroughElementsDTO merchantOrderElements =
-                    requisitionGeneric("/merchant_orders/search?external_reference=" + x.getOrderID().toString(),
+                    requisitionGenericMP("/merchant_orders/search?external_reference=" + x.getOrderID().toString(),
                             HttpMethod.GET, null,
                             new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
                             }, null);
-
-            System.out.println(merchantOrderElements);
 
             MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
 
@@ -138,7 +145,7 @@ public class SubscriptionService {
                 subscriptionPaidAndActiveRepo.deleteById(subscriptionPaidAndEcpiredSaved.getOrderID());
 
                 // Deactivate User subscription in main API
-                requisitionGeneric("",
+                requisitionGenericMP("",
                         HttpMethod.DELETE, null,
                         new ParameterizedTypeReference<Object>() {
                         }, null);

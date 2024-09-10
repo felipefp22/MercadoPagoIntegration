@@ -16,15 +16,15 @@ import reactor.netty.http.client.HttpClient;
 import java.util.Map;
 
 @Component
-public class WebClientLinkRequest {
-    private static LoginOnMP loginOnMP;
-    private static String tokenOnMP;
+public class WebClientLinkRequestSharedChecks {
+    private static LoginOnSharedChecks loginOnSharedChecks;
+    private static String tokenOnSharedChecks;
     private static WebClient webClient;
 
-    public WebClientLinkRequest(LoginOnMP loginOnMP) {
-        this.loginOnMP = loginOnMP;
+    public WebClientLinkRequestSharedChecks(LoginOnSharedChecks loginOnSharedChecks) {
+        this.loginOnSharedChecks = loginOnSharedChecks;
         webClient = WebClient.builder()
-                .baseUrl(loginOnMP.getUrl())
+                .baseUrl(loginOnSharedChecks.getUrl())
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .resolver(DefaultAddressResolverGroup.INSTANCE)))
                 .build();
@@ -32,14 +32,14 @@ public class WebClientLinkRequest {
 
     // <>---|Methods|-----------------------------------------------<>
 
-    public static <T> T requisitionGeneric(String uri, HttpMethod httpMethod, Object requestBody,
-                                           ParameterizedTypeReference<T> responseType, Map<String, String> headers) {
+    public static <T> T requisitionGenericSharedChecks(String uri, HttpMethod httpMethod, Object requestBody,
+                                                       ParameterizedTypeReference<T> responseType, Map<String, String> headers) {
 
-        return retryRequest(uri, httpMethod, requestBody, responseType,
+        return retryRequestSharedChecks(uri, httpMethod, requestBody, responseType,
                 headers, 5);
     }
-    public static <T> T retryRequest(String uri, HttpMethod httpMethod, Object requestBody,
-                                     ParameterizedTypeReference<T> responseType, Map<String, String> headers, int remainingRetries) {
+    public static <T> T retryRequestSharedChecks(String uri, HttpMethod httpMethod, Object requestBody,
+                                                 ParameterizedTypeReference<T> responseType, Map<String, String> headers, int remainingRetries) {
 
         try {
             return webClient
@@ -49,7 +49,7 @@ public class WebClientLinkRequest {
                         if (headers != null) {
                             headers.forEach(httpHeaders::add);
                         }
-                        httpHeaders.add("Authorization", tokenOnMP);
+                        httpHeaders.add("Authorization", tokenOnSharedChecks);
                     })
                     .body(requestBody != null ? BodyInserters.fromValue(requestBody) : null)
                     .retrieve()
@@ -62,21 +62,21 @@ public class WebClientLinkRequest {
                 if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED) || ex.getStatusCode().equals(HttpStatus.FORBIDDEN)
                         || ex.getStatusCode().equals(HttpStatus.valueOf(503))) {
                     // Call your login method here
-                    loginOnMP();
+                    loginOnSharedChecks();
                     // Retry the request
-                    return retryRequest(uri, httpMethod, requestBody, responseType, headers,remainingRetries - 1);
+                    return retryRequestSharedChecks(uri, httpMethod, requestBody, responseType, headers,remainingRetries - 1);
                 }
             }
             throw e;
         }
     }
 
-    public static void loginOnMP() {
+    public static void loginOnSharedChecks() {
         var requisitionPath = ("/oauth/token");
 
         var responseOfWitsis =
-                requisitionGeneric(requisitionPath, HttpMethod.POST, loginOnMP,new ParameterizedTypeReference<LoginDataResponseDTO>() {},null);
+                requisitionGenericSharedChecks(requisitionPath, HttpMethod.POST, loginOnSharedChecks,new ParameterizedTypeReference<LoginDataResponseDTO>() {},null);
 
-        tokenOnMP = (responseOfWitsis.token_type() + " " + responseOfWitsis.access_token());
+        tokenOnSharedChecks = (responseOfWitsis.token_type() + " " + responseOfWitsis.access_token());
     }
 }

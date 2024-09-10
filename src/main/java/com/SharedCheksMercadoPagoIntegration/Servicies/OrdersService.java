@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequest.requisitionGeneric;
+import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequestMP.requisitionGenericMP;
 
 @Service
 public class OrdersService {
@@ -46,7 +46,7 @@ public class OrdersService {
                     1
             );
 
-            Object returnOfMP = requisitionGeneric("/checkout/preferences", HttpMethod.POST, preference,
+            Object returnOfMP = requisitionGenericMP("/checkout/preferences", HttpMethod.POST, preference,
                     new ParameterizedTypeReference<Object>() {
                     }, null);
 

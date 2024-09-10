@@ -2,3 +2,4 @@
 Para criar uma nova ordem de pagamento subscription, nao pode ter nenhuma pending criada (se tiver ver se da pra atualizar), nem
 nenhuma Active
 
+- ajetiar todos horarios para UTC
