@@ -2,8 +2,6 @@ package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrder;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -17,9 +15,9 @@ public class SubscribeOrderPaidAndExpired {
 
     private String emailProfileID;
     private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime paidAt;
-    private LocalDateTime validTill;
+    private LocalDateTime createdAtUTC;
+    private LocalDateTime paidAtUTC;
+    private LocalDateTime validTillUTC;
 
     private Double value;
     private KindOfSubscription kindOfSubscription;
@@ -37,9 +35,9 @@ public class SubscribeOrderPaidAndExpired {
         this.orderID = subscribeOrderPaidAndActive.getOrderID();
         this.emailProfileID = subscribeOrderPaidAndActive.getEmailProfileID();
         this.status = subscribeOrderPaidAndActive.getStatus();
-        this.createdAt = subscribeOrderPaidAndActive.getCreatedAt();
-        this.paidAt = LocalDateTime.now();
-        this.validTill = subscribeOrderPaidAndActive.getValidTill();
+        this.createdAtUTC = subscribeOrderPaidAndActive.getCreatedAtUTC();
+        this.paidAtUTC = subscribeOrderPaidAndActive.getPaidAtUTC();
+        this.validTillUTC = subscribeOrderPaidAndActive.getValidTillUTC();
         this.value = subscribeOrderPaidAndActive.getValue();
         this.kindOfSubscription = subscribeOrderPaidAndActive.getKindOfSubscription();
         this.mercadoPagoID = subscribeOrderPaidAndActive.getMercadoPagoID();
@@ -65,22 +63,22 @@ public class SubscribeOrderPaidAndExpired {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getCreatedAtUTC() {
+        return createdAtUTC;
     }
 
-    public LocalDateTime getPaidAt() {
-        return paidAt;
+    public LocalDateTime getPaidAtUTC() {
+        return paidAtUTC;
     }
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
+    public void setPaidAtUTC(LocalDateTime paidAtUTC) {
+        this.paidAtUTC = paidAtUTC;
     }
 
-    public LocalDateTime getValidTill() {
-        return validTill;
+    public LocalDateTime getValidTillUTC() {
+        return validTillUTC;
     }
-    public void setValidTill(LocalDateTime validTill) {
-        this.validTill = validTill;
+    public void setValidTillUTC(LocalDateTime validTillUTC) {
+        this.validTillUTC = validTillUTC;
     }
 
     public Double getValue() {

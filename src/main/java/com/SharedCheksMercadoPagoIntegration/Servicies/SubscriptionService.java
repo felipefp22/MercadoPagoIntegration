@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class SubscriptionService {
         SubscribeOrderPaidAndActive subscriptionActive = subscriptionPaidAndActiveRepo.findByEmailProfileID(email)
                 .stream().findFirst().orElse(null);
 
-        if (subscriptionActive != null && subscriptionActive.getValidTill().isAfter(LocalDateTime.now())) {
+        if (subscriptionActive != null && subscriptionActive.getValidTillUTC().isAfter(LocalDateTime.now())) {
             // Activate User subscription in main API
             activateSubscriptionForUserMainAPI(subscriptionActive);
 
@@ -79,17 +80,18 @@ public class SubscriptionService {
     @Transactional
     private void movePendingSubscriptionToPaidAndActivateSubscription(SubscribeOrderPendind subscribeOrderPendindPendingToChange,
                                                                       MerchantOrderDTO merchantOrderDTO) {
+        var subscribeOrderPaidAndActiveToSave = new SubscribeOrderPaidAndActive(subscribeOrderPendindPendingToChange);
 
-        subscribeOrderPendindPendingToChange.setStatus("PAID");
-        subscribeOrderPendindPendingToChange.setPaidAt(
+        subscribeOrderPaidAndActiveToSave.setStatus("PAID");
+        subscribeOrderPaidAndActiveToSave.setPaidAtUTC(
                 takeUtcLocalDateTimeDatePayApproved(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
-        subscribeOrderPendindPendingToChange.setValidTill(
+        subscribeOrderPaidAndActiveToSave.setValidTillUTC(
                 takeUtcLocalDateTimeDatePayApproved(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
                 .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
 
-        var subscribeOrderPaidAndActiveToSave = new SubscribeOrderPaidAndActive(subscribeOrderPendindPendingToChange);
         subscribeOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
 
+        // Persisting in DB
         SubscribeOrderPaidAndActive subscribeOrderToActivate = subscriptionPaidAndActiveRepo.save(subscribeOrderPaidAndActiveToSave);
         subscriptionPendentRepo.deleteById(subscribeOrderToActivate.getOrderID());
 
@@ -115,6 +117,7 @@ public class SubscriptionService {
     // <>-------------- Routines --------------<>
     @Scheduled(fixedDelay = 6000000)
     public void verifyWithMpIfHadNewPayment() {
+
         List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendentRepo.findAll();
 
         subscriptionsPendind.forEach(x -> {
@@ -139,7 +142,7 @@ public class SubscriptionService {
         List<SubscribeOrderPaidAndActive> subscriptionPaidRepo = subscriptionPaidAndActiveRepo.findAll();
 
         subscriptionPaidRepo.forEach(x -> {
-            if (x.getValidTill().isBefore(LocalDateTime.now())) {
+            if (x.getValidTillUTC().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
                 x.setStatus("PAIDANDEXPIRED");
                 var subscriptionPaidAndEcpiredSaved = subscriptionPaidAndExpiredRepo.save(new SubscribeOrderPaidAndExpired(x));
                 subscriptionPaidAndActiveRepo.deleteById(subscriptionPaidAndEcpiredSaved.getOrderID());

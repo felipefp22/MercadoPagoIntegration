@@ -3,8 +3,6 @@ package com.SharedCheksMercadoPagoIntegration.Entities;
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrder;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrderDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -18,9 +16,9 @@ public class SubscribeOrderPaidAndActive {
 
     private String emailProfileID;
     private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime paidAt;
-    private LocalDateTime validTill;
+    private LocalDateTime createdAtUTC;
+    private LocalDateTime paidAtUTC;
+    private LocalDateTime validTillUTC;
 
     private Double value;
     private KindOfSubscription kindOfSubscription;
@@ -37,9 +35,7 @@ public class SubscribeOrderPaidAndActive {
         this.orderID = subscribeOrderPendind.getOrderID();
         this.emailProfileID = subscribeOrderPendind.getEmailProfileID();
         this.status = subscribeOrderPendind.getStatus();
-        this.createdAt = subscribeOrderPendind.getCreatedAt();
-        this.paidAt = LocalDateTime.now();
-        this.validTill = subscribeOrderPendind.getValidTill();
+        this.createdAtUTC = subscribeOrderPendind.getCreatedAtUTC();
         this.value = subscribeOrderPendind.getValue();
         this.kindOfSubscription = subscribeOrderPendind.getKindOfSubscription();
         this.mercadoPagoID = subscribeOrderPendind.getMercadoPagoID();
@@ -64,22 +60,22 @@ public class SubscribeOrderPaidAndActive {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getCreatedAtUTC() {
+        return createdAtUTC;
     }
 
-    public LocalDateTime getPaidAt() {
-        return paidAt;
+    public LocalDateTime getPaidAtUTC() {
+        return paidAtUTC;
     }
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
+    public void setPaidAtUTC(LocalDateTime paidAtUTC) {
+        this.paidAtUTC = paidAtUTC;
     }
 
-    public LocalDateTime getValidTill() {
-        return validTill;
+    public LocalDateTime getValidTillUTC() {
+        return validTillUTC;
     }
-    public void setValidTill(LocalDateTime validTill) {
-        this.validTill = validTill;
+    public void setValidTillUTC(LocalDateTime validTillUTC) {
+        this.validTillUTC = validTillUTC;
     }
 
     public Double getValue() {

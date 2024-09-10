@@ -4,11 +4,10 @@ import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Entity
@@ -19,9 +18,7 @@ public class SubscribeOrderPendind {
 
     private String emailProfileID;
     private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime paidAt;
-    private LocalDateTime validTill;
+    private LocalDateTime createdAtUTC;
 
     private Double value;
     private KindOfSubscription kindOfSubscription;
@@ -36,7 +33,7 @@ public class SubscribeOrderPendind {
         this.orderID = UUID.randomUUID();
         this.emailProfileID = payerDTO.email();
         this.status = "";
-        this.createdAt = LocalDateTime.now();
+        this.createdAtUTC = LocalDateTime.now(ZoneOffset.UTC);
         this.value = itemsDTO.unit_price();
         this.kindOfSubscription = KindOfSubscription.valueOf(itemsDTO.title());
     }
@@ -60,22 +57,8 @@ public class SubscribeOrderPendind {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
-    }
-
-    public LocalDateTime getValidTill() {
-        return validTill;
-    }
-    public void setValidTill(LocalDateTime validTill) {
-        this.validTill = validTill;
+    public LocalDateTime getCreatedAtUTC() {
+        return createdAtUTC;
     }
 
     public Double getValue() {
