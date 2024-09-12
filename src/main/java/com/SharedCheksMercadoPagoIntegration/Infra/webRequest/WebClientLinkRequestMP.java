@@ -74,9 +74,9 @@ public class WebClientLinkRequestMP {
     public static void loginOnMP() {
         var requisitionPath = ("/oauth/token");
 
-        var responseOfWitsis =
-                requisitionGenericMP(requisitionPath, HttpMethod.POST, loginOnMP,new ParameterizedTypeReference<LoginDataResponseDTO>() {},null);
+        var responseOfMP =
+                requisitionGenericMP(requisitionPath, HttpMethod.POST, loginOnMP,new ParameterizedTypeReference<LoginDataResponseMPDTO>() {},null);
 
-        tokenOnMP = (responseOfWitsis.token_type() + " " + responseOfWitsis.access_token());
+        tokenOnMP = (responseOfMP.token_type() + " " + responseOfMP.access_token());
     }
 }

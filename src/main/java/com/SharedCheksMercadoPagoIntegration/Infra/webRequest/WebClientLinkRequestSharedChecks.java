@@ -72,11 +72,12 @@ public class WebClientLinkRequestSharedChecks {
     }
 
     public static void loginOnSharedChecks() {
-        var requisitionPath = ("/oauth/token");
+        var requisitionPath = ("/auth/login");
 
-        var responseOfWitsis =
-                requisitionGenericSharedChecks(requisitionPath, HttpMethod.POST, loginOnSharedChecks,new ParameterizedTypeReference<LoginDataResponseDTO>() {},null);
+        var responseOfSharedChecks =
+                requisitionGenericSharedChecks(requisitionPath, HttpMethod.POST, loginOnSharedChecks,
+                        new ParameterizedTypeReference<LoginDataResponseSharedChecksDTO>() {},null);
 
-        tokenOnSharedChecks = (responseOfWitsis.token_type() + " " + responseOfWitsis.access_token());
+        tokenOnSharedChecks = (responseOfSharedChecks.token_type() + " " + responseOfSharedChecks.access_token());
     }
 }

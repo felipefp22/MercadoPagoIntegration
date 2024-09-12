@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequestMP.requisitionGenericMP;
@@ -100,11 +101,14 @@ public class SubscriptionService {
     }
 
     private void activateSubscriptionForUserMainAPI(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive) {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("headers", subscribeOrderPaidAndActive.getEmailProfileID());
+        headers.put("validUntillUTC", subscribeOrderPaidAndActive.getValidTillUTC().toString());
 
-        requisitionGenericSharedChecks("",
+        requisitionGenericSharedChecks("/internal-subscription-actions/activate-subscription",
                 HttpMethod.POST, null,
                 new ParameterizedTypeReference<Object>() {
-                }, null);
+                }, headers);
     }
 
     private LocalDateTime takeLocalDateTimeDatePayApprovedUTC(String dateApprovedString) {
@@ -148,7 +152,7 @@ public class SubscriptionService {
                 subscriptionPaidAndActiveRepo.deleteById(subscriptionPaidAndExpiredSaved.getOrderID());
 
                 // Deactivate User subscription in main API
-//                requisitionGenericSharedChecks("",
+//                requisitionGenericSharedChecks("/internal-subscription-actions/deactivate-subscription",
 //                        HttpMethod.DELETE, null,
 //                        new ParameterizedTypeReference<Object>() {
 //                        }, null);
