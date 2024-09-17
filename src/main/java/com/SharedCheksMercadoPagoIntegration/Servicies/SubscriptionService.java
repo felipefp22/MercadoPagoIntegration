@@ -45,7 +45,7 @@ public class SubscriptionService {
         SubscribeOrderPaidAndActive subscriptionActive = subscriptionPaidAndActiveRepo.findByEmailProfileID(email)
                 .stream().findFirst().orElse(null);
 
-        if (subscriptionActive != null && subscriptionActive.getValidTillUTC().isAfter(LocalDateTime.now())) {
+        if (subscriptionActive != null && subscriptionActive.getValidTillUTC().isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
             // Activate User subscription in main API
             activateSubscriptionForUserMainAPI(subscriptionActive);
 
@@ -102,13 +102,13 @@ public class SubscriptionService {
 
     private void activateSubscriptionForUserMainAPI(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive) {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("headers", subscribeOrderPaidAndActive.getEmailProfileID());
         headers.put("validUntillUTC", subscribeOrderPaidAndActive.getValidTillUTC().toString());
+        headers.put("userID", subscribeOrderPaidAndActive.getEmailProfileID());
 
         requisitionGenericSharedChecks("/internal-subscription-actions/activate-subscription",
                 HttpMethod.POST, null,
-                new ParameterizedTypeReference<Object>() {
-                }, headers);
+                new ParameterizedTypeReference<>() {},
+                headers);
     }
 
     private LocalDateTime takeLocalDateTimeDatePayApprovedUTC(String dateApprovedString) {

@@ -9,7 +9,7 @@ public class LoginOnSharedChecks {
     @Value("${sharedchecks.email.login}")
     private String emailOrUsername;
 
-    @Value("${sharedchecks.PASSWORD}")
+    @Value("${sharedchecks.password}")
     private String password;
 
     @Value("${sharedchecks.url}")
