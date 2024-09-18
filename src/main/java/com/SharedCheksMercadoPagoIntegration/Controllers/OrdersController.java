@@ -3,6 +3,7 @@ package com.SharedCheksMercadoPagoIntegration.Controllers;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceRetunDTO;
 import com.SharedCheksMercadoPagoIntegration.Servicies.OrdersService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,8 @@ public class OrdersController {
 
     // <>-------------- Methods --------------<>
     @PostMapping("/create/{kindOfSubscription}")
-    public Object create(@RequestBody PayerDTO payerDTO,
-                        @PathVariable KindOfSubscription kindOfSubscription) {
+    public PreferenceRetunDTO create(@RequestBody PayerDTO payerDTO,
+                                     @PathVariable KindOfSubscription kindOfSubscription) {
         if(payerDTO.email() == null) throw new IllegalArgumentException("Email is required");
 
         return ordersService.createOrder(payerDTO,kindOfSubscription.getItemsDTO());

@@ -13,6 +13,7 @@ public class SubscribeOrderPaidAndExpired {
     @Id
     private UUID orderID;
 
+
     private String emailProfileID;
     private String status;
     private LocalDateTime createdAtUTC;
@@ -51,6 +52,8 @@ public class SubscribeOrderPaidAndExpired {
     public UUID getOrderID() {
         return orderID;
     }
+
+
 
     public String getEmailProfileID() {
         return emailProfileID;

@@ -2,6 +2,7 @@ package com.SharedCheksMercadoPagoIntegration.Servicies;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.Preference;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.*;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceRetunDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendentRepo;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,39 +27,55 @@ public class OrdersService {
     }
 
     // <>-------------- Methods --------------<>
-    public Object createOrder(PayerDTO payerDTO, ItemsDTO itemsDTO) {
+    public PreferenceRetunDTO createOrder(PayerDTO payerDTO, ItemsDTO itemsDTO) {
         try {
-            SubscribeOrderPendind subscribeOrderPendind = new SubscribeOrderPendind(payerDTO, itemsDTO);
-            List<ExcludedPaymentMethods> excludedPaymentMethods =
-                    List.of("bolbradesco", "pec").stream().map(ExcludedPaymentMethods::new).toList();
+            SubscribeOrderPendind subscribeOrderPendindFound =
+                    subscriptionPendentRepo.findByEmailProfileID(payerDTO.email()).stream().findFirst().orElse(null);
+            if (subscribeOrderPendindFound != null) {
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                return updateOrder(subscribeOrderPendindFound, itemsDTO);
+            } else {
+                SubscribeOrderPendind subscribeOrderPendind = new SubscribeOrderPendind(payerDTO, itemsDTO);
 
-            Preference preference = new Preference(
-                    new BackUrlsDTO("www.google.com.br", "www.google.com.br", "www.google.com.br"),
-                    subscribeOrderPendind.getOrderID().toString(),
-                    true,
-                    ZonedDateTime.of(LocalDateTime.now(ZoneOffset.UTC).plusDays(1), ZoneOffset.UTC).format(formatter),
-                    List.of(itemsDTO),
-                    "https://0e44-2603-8000-6d01-e38a-cc9e-d968-a165-3c3a.ngrok-free.app/webhook-receives/mp-payments",
-                    payerDTO,
-                    new PaymentMethods(excludedPaymentMethods),
-                    1
-            );
+                List<ExcludedPaymentMethods> excludedPaymentMethods =
+                        List.of("bolbradesco", "pec").stream().map(ExcludedPaymentMethods::new).toList();
 
-            Object returnOfMP = requisitionGenericMP("/checkout/preferences", HttpMethod.POST, preference,
-                    new ParameterizedTypeReference<Object>() {
-                    }, null);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-            //precisa revisar isso aqui
-            subscribeOrderPendind.setStatus("CREATED");
-            subscriptionPendentRepo.save(subscribeOrderPendind);
+                Preference preference = new Preference(
+                        new BackUrlsDTO("www.google.com.br", "www.google.com.br", "www.google.com.br"),
+                        subscribeOrderPendind.getOrderID().toString(),
+                        true,
+                        ZonedDateTime.of(LocalDateTime.now(ZoneOffset.UTC).plusDays(1), ZoneOffset.UTC).format(formatter),
+                        List.of(itemsDTO),
+                        "https://0e44-2603-8000-6d01-e38a-cc9e-d968-a165-3c3a.ngrok-free.app/webhook-receives/mp-payments",
+                        payerDTO,
+                        new PaymentMethods(excludedPaymentMethods),
+                        1
+                );
 
-            return returnOfMP;
+                PreferenceRetunDTO returnOfMP = requisitionGenericMP("/checkout/preferences", HttpMethod.POST, preference,
+                        new ParameterizedTypeReference<PreferenceRetunDTO>() {},
+                        null);
 
+                subscribeOrderPendind.setMercadoPagoID(returnOfMP.id());
+
+                //precisa revisar isso aqui
+                subscribeOrderPendind.setStatus("CREATED");
+                subscriptionPendentRepo.save(subscribeOrderPendind);
+
+                return returnOfMP;
+            }
         } catch (WebClientException e) {
             System.out.println(e.getMessage().toString());
         }
         return null;
+    }
+
+    public Object updateOrder(SubscribeOrderPendind subscribeOrderPendindFound, ItemsDTO itemsDTO){
+
+        Object returnOfMP = requisitionGenericMP("/checkout/preferences", HttpMethod.POST, preference,
+                new ParameterizedTypeReference<Object>() {},
+                null);
     }
 }

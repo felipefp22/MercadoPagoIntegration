@@ -29,6 +29,7 @@ public class SubscribeOrderPendind {
     // <>---------------- Constructors ----------------<>
     public SubscribeOrderPendind() {
     }
+
     public SubscribeOrderPendind(PayerDTO payerDTO, ItemsDTO itemsDTO) {
         this.orderID = UUID.randomUUID();
         this.emailProfileID = payerDTO.email();
@@ -46,6 +47,7 @@ public class SubscribeOrderPendind {
         return orderID;
     }
 
+
     public String getEmailProfileID() {
         return emailProfileID;
     }
@@ -53,6 +55,7 @@ public class SubscribeOrderPendind {
     public String getStatus() {
         return status;
     }
+
     public void setStatus(String status) {
         this.status = status;
     }
@@ -72,6 +75,7 @@ public class SubscribeOrderPendind {
     public String getMercadoPagoID() {
         return mercadoPagoID;
     }
+
     public void setMercadoPagoID(String mercadoPagoID) {
         this.mercadoPagoID = mercadoPagoID;
     }

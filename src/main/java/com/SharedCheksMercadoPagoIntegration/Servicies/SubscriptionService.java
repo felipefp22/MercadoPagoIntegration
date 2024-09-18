@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -40,7 +41,7 @@ public class SubscriptionService {
     // <>-------------- Methods --------------<>
 
     public String verifyIfHaveActiveSubscription(String email) {
-        verifyWithMpIfHadNewPayment();
+        verifyWithMpIfHadNewPaymentEspecificUser(email);
 
         SubscribeOrderPaidAndActive subscriptionActive = subscriptionPaidAndActiveRepo.findByEmailProfileID(email)
                 .stream().findFirst().orElse(null);
@@ -62,16 +63,7 @@ public class SubscriptionService {
                             new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
                             }, null);
 
-//            MerchantOrder merchantOrder = merchantOrderElements.elements().stream().findFirst().orElse(null);
-//
-//            if (merchantOrder.getPayments().stream().findFirst().orElse(null).status().equals("approved")) {
-//                // Move pending subscription to paid and activate subscription
-//                movePendingSubscriptionToPaidAndActivateSubscription(subscriptionPending, merchantOrder);
-//
-//                return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
-//            } else {
             return "No subscription found";
-//            }
         }
     }
 
@@ -88,7 +80,7 @@ public class SubscriptionService {
                 takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
         subscribeOrderPaidAndActiveToSave.setValidTillUTC(
                 takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
-                .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
+                        .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
 
         subscribeOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
 
@@ -100,6 +92,27 @@ public class SubscriptionService {
         activateSubscriptionForUserMainAPI(subscribeOrderToActivate);
     }
 
+    public void verifyWithMpIfHadNewPaymentEspecificUser(String emailID) {
+
+        SubscribeOrderPendind subscriptionsPendind =
+                subscriptionPendentRepo.findByEmailProfileID(emailID).stream().findFirst().orElse(null);
+
+        if (subscriptionsPendind != null) {
+            MerchantOrdersThroughElementsDTO merchantOrderElements =
+                    requisitionGenericMP(
+                            "/merchant_orders/search?external_reference=" + subscriptionsPendind.getOrderID().toString(),
+                            HttpMethod.GET, null,
+                            new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
+                            }, null);
+
+            MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
+
+            if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
+                movePendingSubscriptionToPaidAndActivateSubscription(subscriptionsPendind, merchantOrderDTO);
+            }
+        }
+    }
+
     private void activateSubscriptionForUserMainAPI(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive) {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("validUntillUTC", subscribeOrderPaidAndActive.getValidTillUTC().toString());
@@ -107,7 +120,8 @@ public class SubscriptionService {
 
         requisitionGenericSharedChecks("/internal-subscription-actions/activate-subscription",
                 HttpMethod.POST, null,
-                new ParameterizedTypeReference<>() {},
+                new ParameterizedTypeReference<>() {
+                },
                 headers);
     }
 
