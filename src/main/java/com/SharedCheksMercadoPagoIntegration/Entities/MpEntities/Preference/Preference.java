@@ -9,6 +9,7 @@ import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.Pref
 import java.util.List;
 
 public record Preference(
+        //Boolean auto_return,
         BackUrlsDTO back_urls,
         String external_reference,
         Boolean expires,

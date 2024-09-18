@@ -1,7 +1,5 @@
-package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference;
+package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS;
 
-
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.*;
 
 import java.util.List;
 
@@ -32,7 +30,7 @@ public record PreferenceRetunDTO(
         PaymentMethods payment_methods,
         Object processing_modes,
         Object product_id,
-        RedirectUrlsDTO redirect_urls,
+        BackUrlsDTO redirect_urls,
         String sandbox_init_point,
         String site_id,
         Object shipments,

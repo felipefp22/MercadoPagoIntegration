@@ -1,17 +1,14 @@
 package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PreferenceRetunDTO;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Entity
-public class SubscribeOrderPendind {
+public class SubscribeOrderCancelled {
 
     @Id
     private UUID orderID;
@@ -30,16 +27,18 @@ public class SubscribeOrderPendind {
     private PreferenceRetunDTO preferenceInfos;
 
     // <>---------------- Constructors ----------------<>
-    public SubscribeOrderPendind() {
+    public SubscribeOrderCancelled() {
     }
 
-    public SubscribeOrderPendind(PayerDTO payerDTO, ItemsDTO itemsDTO) {
-        this.orderID = UUID.randomUUID();
-        this.emailProfileID = payerDTO.email();
+    public SubscribeOrderCancelled(SubscribeOrderPendind subscribeOrderPendind){
+        this.orderID = subscribeOrderPendind.getOrderID();
+        this.emailProfileID = subscribeOrderPendind.getEmailProfileID();
         this.status = "";
-        this.createdAtUTC = LocalDateTime.now(ZoneOffset.UTC);
-        this.value = itemsDTO.unit_price();
-        this.kindOfSubscription = KindOfSubscription.valueOf(itemsDTO.title());
+        this.createdAtUTC = subscribeOrderPendind.getCreatedAtUTC();
+        this.value = subscribeOrderPendind.getValue();
+        this.kindOfSubscription = subscribeOrderPendind.getKindOfSubscription();
+        this.mercadoPagoID = subscribeOrderPendind.getMercadoPagoID();
+        this.preferenceInfos = subscribeOrderPendind.getPreferenceInfos();
     }
 
 
@@ -49,6 +48,7 @@ public class SubscribeOrderPendind {
     public UUID getOrderID() {
         return orderID;
     }
+
 
     public String getEmailProfileID() {
         return emailProfileID;
@@ -80,14 +80,6 @@ public class SubscribeOrderPendind {
 
     public void setMercadoPagoID(String mercadoPagoID) {
         this.mercadoPagoID = mercadoPagoID;
-    }
-
-    public PreferenceRetunDTO getPreferenceInfos() {
-        return preferenceInfos;
-    }
-
-    public void setPreferenceInfos(PreferenceRetunDTO preferenceInfos) {
-        this.preferenceInfos = preferenceInfos;
     }
 }
 
