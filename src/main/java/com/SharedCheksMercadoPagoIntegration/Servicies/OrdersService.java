@@ -3,10 +3,11 @@ package com.SharedCheksMercadoPagoIntegration.Servicies;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.Preference;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.*;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PreferenceRetunDTO;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceInfos;
 import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderCancelled;
 import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionCancelledRepo;
-import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendentRepo;
+import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendingRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -24,11 +25,11 @@ import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLi
 
 @Service
 public class OrdersService {
-    private final SubscriptionPendentRepo subscriptionPendentRepo;
+    private final SubscriptionPendingRepo subscriptionPendingRepo;
     private final SubscriptionCancelledRepo subscriptionCancelledRepo;
 
-    public OrdersService(SubscriptionPendentRepo subscriptionPendentRepo, SubscriptionCancelledRepo subscriptionCancelledRepo) {
-        this.subscriptionPendentRepo = subscriptionPendentRepo;
+    public OrdersService(SubscriptionPendingRepo subscriptionPendingRepo, SubscriptionCancelledRepo subscriptionCancelledRepo) {
+        this.subscriptionPendingRepo = subscriptionPendingRepo;
         this.subscriptionCancelledRepo = subscriptionCancelledRepo;
     }
 
@@ -36,7 +37,7 @@ public class OrdersService {
     public PreferenceRetunDTO createOrder(PayerDTO payerDTO, ItemsDTO itemsDTO) {
         try {
             SubscribeOrderPendind subscribeOrderPendindFound =
-                    subscriptionPendentRepo.findByEmailProfileID(payerDTO.email()).stream().findFirst().orElse(null);
+                    subscriptionPendingRepo.findByEmailProfileID(payerDTO.email()).stream().findFirst().orElse(null);
 
             if (subscribeOrderPendindFound != null) {
 
@@ -69,10 +70,11 @@ public class OrdersService {
                                 null);
 
                 subscribeOrderPendind.setMercadoPagoID(returnOfMP.id());
+                subscribeOrderPendind.setPreferenceInfos(new PreferenceInfos(returnOfMP));
 
                 //precisa revisar isso aqui
                 subscribeOrderPendind.setStatus("CREATED");
-                subscriptionPendentRepo.save(subscribeOrderPendind);
+                subscriptionPendingRepo.save(subscribeOrderPendind);
 
                 return returnOfMP;
             }
@@ -91,7 +93,7 @@ public class OrdersService {
         subscribeOrderPendindFound.setStatus("CANCELLED");
         SubscribeOrderCancelled subscribeOrderCancelled = new SubscribeOrderCancelled(subscribeOrderPendindFound);
         SubscribeOrderCancelled subscribeOrderCancelledSaved = subscriptionCancelledRepo.save(subscribeOrderCancelled);
-        subscriptionPendentRepo.deleteById(subscribeOrderCancelledSaved.getOrderID());
+        subscriptionPendingRepo.deleteById(subscribeOrderCancelledSaved.getOrderID());
     }
 
     // <>-------- Aux Private Methods --------<>
@@ -106,13 +108,15 @@ public class OrdersService {
                         },
                         null);
 
-        if (retrivedPreferenceFromMP.items().stream().findFirst().orElse(null).title() == itemsDTO.title()
-                && retrivedPreferenceFromMP.items().stream().findFirst().orElse(null).unit_price() == itemsDTO.unit_price()) {
+        if (subscribeOrderPendindFound.getKindOfSubscription().getItemsDTO() == itemsDTO) {
+
+            subscribeOrderPendindFound.setUpdatedExpirationAtUTC(LocalDateTime.now(ZoneOffset.UTC));
 
             UpdateExpireDateDTO bodyToUpdateOnlyExpireDate =
                     new UpdateExpireDateDTO(
                             ZonedDateTime.of(LocalDateTime.now(ZoneOffset.UTC).plusDays(1), ZoneOffset.UTC).format(formatter));
 
+            // Updating on MP
             PreferenceRetunDTO returnOfMP =
                     requisitionGenericMP("/checkout/preferences/" + subscribeOrderPendindFound.getMercadoPagoID(),
                             HttpMethod.PUT,
@@ -121,6 +125,8 @@ public class OrdersService {
                             },
                             null);
 
+            subscriptionPendingRepo.save(subscribeOrderPendindFound);
+
             return returnOfMP;
 
         } else {
@@ -128,7 +134,7 @@ public class OrdersService {
         }
     }
 
-    public void expireOrderOnMP(SubscribeOrderPendind subscribeOrderPendindFound) {
+    private void expireOrderOnMP(SubscribeOrderPendind subscribeOrderPendindFound) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
         UpdateExpireDateDTO bodyToExpireOrder =
@@ -144,12 +150,12 @@ public class OrdersService {
     }
 
     // <>-------------- Routines --------------<>
-    @Scheduled(fixedDelay = 50000)
+    @Scheduled(fixedDelay = 5000)
     public void moveOldOrdersNotPaidToCancelledRepo() {
-        List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendentRepo.findAll();
+        List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendingRepo.findAll();
 
         subscriptionsPendind.forEach(x -> {
-            if (x.getCreatedAtUTC().plusDays(1).isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+            if (x.getUpdatedExpirationAtUTC().plusDays(1).isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
 
                 cancelAndExpireNoFurtherOrder(x);
             }

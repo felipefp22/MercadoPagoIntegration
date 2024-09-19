@@ -3,7 +3,6 @@ package com.SharedCheksMercadoPagoIntegration.Entities;
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PreferenceRetunDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceInfos;
 import jakarta.persistence.*;
 
@@ -20,6 +19,7 @@ public class SubscribeOrderPendind {
     private String emailProfileID;
     private String status;
     private LocalDateTime createdAtUTC;
+    private LocalDateTime updatedExpirationAtUTC;
 
     private Double value;
     private KindOfSubscription kindOfSubscription;
@@ -39,6 +39,7 @@ public class SubscribeOrderPendind {
         this.emailProfileID = payerDTO.email();
         this.status = "";
         this.createdAtUTC = LocalDateTime.now(ZoneOffset.UTC);
+        this.updatedExpirationAtUTC = this.createdAtUTC;
         this.value = itemsDTO.unit_price();
         this.kindOfSubscription = KindOfSubscription.valueOf(itemsDTO.title());
     }
@@ -65,6 +66,13 @@ public class SubscribeOrderPendind {
 
     public LocalDateTime getCreatedAtUTC() {
         return createdAtUTC;
+    }
+
+    public LocalDateTime getUpdatedExpirationAtUTC() {
+        return updatedExpirationAtUTC;
+    }
+    public void setUpdatedExpirationAtUTC(LocalDateTime updatedExpirationAtUTC) {
+        this.updatedExpirationAtUTC = updatedExpirationAtUTC;
     }
 
     public Double getValue() {

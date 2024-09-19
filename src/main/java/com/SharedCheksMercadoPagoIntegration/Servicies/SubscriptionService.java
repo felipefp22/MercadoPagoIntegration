@@ -7,7 +7,7 @@ import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPaidAndExpir
 import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPaidAndActiveRepo;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPaidAndExpiredRepo;
-import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendentRepo;
+import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendingRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -28,12 +28,12 @@ import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLi
 @Service
 public class SubscriptionService {
 
-    private final SubscriptionPendentRepo subscriptionPendentRepo;
+    private final SubscriptionPendingRepo subscriptionPendingRepo;
     private final SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo;
     private final SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo;
 
-    public SubscriptionService(SubscriptionPendentRepo subscriptionPendentRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo1, SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo) {
-        this.subscriptionPendentRepo = subscriptionPendentRepo;
+    public SubscriptionService(SubscriptionPendingRepo subscriptionPendingRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo1, SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo) {
+        this.subscriptionPendingRepo = subscriptionPendingRepo;
         this.subscriptionPaidAndActiveRepo = subscriptionPaidAndActiveRepo1;
         this.subscriptionPaidAndExpiredRepo = subscriptionPaidAndExpiredRepo;
     }
@@ -52,7 +52,7 @@ public class SubscriptionService {
 
             return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
         } else {
-            SubscribeOrderPendind subscriptionPending = subscriptionPendentRepo.findByEmailProfileID(email)
+            SubscribeOrderPendind subscriptionPending = subscriptionPendingRepo.findByEmailProfileID(email)
                     .stream().findFirst().orElseThrow(() -> new RuntimeException("No subscription found"));
 
             var externalReference = subscriptionPending.getOrderID();
@@ -86,7 +86,7 @@ public class SubscriptionService {
 
         // Persisting in DB
         SubscribeOrderPaidAndActive subscribeOrderToActivate = subscriptionPaidAndActiveRepo.save(subscribeOrderPaidAndActiveToSave);
-        subscriptionPendentRepo.deleteById(subscribeOrderToActivate.getOrderID());
+        subscriptionPendingRepo.deleteById(subscribeOrderToActivate.getOrderID());
 
         // Activate User subscription in main API
         activateSubscriptionForUserMainAPI(subscribeOrderToActivate);
@@ -95,7 +95,7 @@ public class SubscriptionService {
     public void verifyWithMpIfHadNewPaymentEspecificUser(String emailID) {
 
         SubscribeOrderPendind subscriptionsPendind =
-                subscriptionPendentRepo.findByEmailProfileID(emailID).stream().findFirst().orElse(null);
+                subscriptionPendingRepo.findByEmailProfileID(emailID).stream().findFirst().orElse(null);
 
         if (subscriptionsPendind != null) {
             MerchantOrdersThroughElementsDTO merchantOrderElements =
@@ -136,7 +136,7 @@ public class SubscriptionService {
     @Scheduled(fixedDelay = 6000000)
     public void verifyWithMpIfHadNewPayment() {
 
-        List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendentRepo.findAll();
+        List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendingRepo.findAll();
 
         subscriptionsPendind.forEach(x -> {
             MerchantOrdersThroughElementsDTO merchantOrderElements =

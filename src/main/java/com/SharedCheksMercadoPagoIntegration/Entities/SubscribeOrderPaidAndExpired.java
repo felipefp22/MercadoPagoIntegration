@@ -17,6 +17,7 @@ public class SubscribeOrderPaidAndExpired {
     private String emailProfileID;
     private String status;
     private LocalDateTime createdAtUTC;
+    private LocalDateTime getUpdatedExpirationAtUTC;
     private LocalDateTime paidAtUTC;
     private LocalDateTime validTillUTC;
 
@@ -37,6 +38,7 @@ public class SubscribeOrderPaidAndExpired {
         this.emailProfileID = subscribeOrderPaidAndActive.getEmailProfileID();
         this.status = subscribeOrderPaidAndActive.getStatus();
         this.createdAtUTC = subscribeOrderPaidAndActive.getCreatedAtUTC();
+        this.getUpdatedExpirationAtUTC = subscribeOrderPaidAndActive.getGetUpdatedExpirationAtUTC();
         this.paidAtUTC = subscribeOrderPaidAndActive.getPaidAtUTC();
         this.validTillUTC = subscribeOrderPaidAndActive.getValidTillUTC();
         this.value = subscribeOrderPaidAndActive.getValue();
@@ -53,8 +55,6 @@ public class SubscribeOrderPaidAndExpired {
         return orderID;
     }
 
-
-
     public String getEmailProfileID() {
         return emailProfileID;
     }
@@ -68,6 +68,13 @@ public class SubscribeOrderPaidAndExpired {
 
     public LocalDateTime getCreatedAtUTC() {
         return createdAtUTC;
+    }
+
+    public LocalDateTime getGetUpdatedExpirationAtUTC() {
+        return getUpdatedExpirationAtUTC;
+    }
+    public void setGetUpdatedExpirationAtUTC(LocalDateTime getUpdatedExpirationAtUTC) {
+        this.getUpdatedExpirationAtUTC = getUpdatedExpirationAtUTC;
     }
 
     public LocalDateTime getPaidAtUTC() {

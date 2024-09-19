@@ -53,8 +53,8 @@ public class PreferenceInfos {
         this.binary_mode = preferenceRetunDTO.binary_mode();
         this.client_id = preferenceRetunDTO.client_id();
         this.collector_id = preferenceRetunDTO.collector_id();
-        this.coupon_code = preferenceRetunDTO.coupon_code().toString();
-        this.coupon_labels = preferenceRetunDTO.coupon_labels().toString();
+        this.coupon_code = preferenceRetunDTO.coupon_code() != null ? preferenceRetunDTO.coupon_code().toString():null;
+        this.coupon_labels = preferenceRetunDTO.coupon_labels()!=null? preferenceRetunDTO.coupon_labels().toString():null;
         this.date_created = preferenceRetunDTO.date_created();
         this.date_of_expiration = preferenceRetunDTO.date_of_expiration();
         this.expiration_date_from = preferenceRetunDTO.expiration_date_from();
@@ -63,21 +63,21 @@ public class PreferenceInfos {
         this.external_reference = preferenceRetunDTO.external_reference();
         this.id = preferenceRetunDTO.id();
         this.init_point = preferenceRetunDTO.init_point();
-        this.internal_metadata = preferenceRetunDTO.internal_metadata().toString();
+        this.internal_metadata = preferenceRetunDTO.internal_metadata()!=null ? preferenceRetunDTO.internal_metadata().toString():null;
         //this.items = preferenceRetunDTO.items();
         this.marketplace_fee = preferenceRetunDTO.marketplace_fee();
-        this.metadata = preferenceRetunDTO.metadata().toString().toString();
+        this.metadata = preferenceRetunDTO.metadata()!=null ? preferenceRetunDTO.metadata().toString():null;
         this.notification_url = preferenceRetunDTO.notification_url();
         this.operation_type = preferenceRetunDTO.operation_type();
         //this.payer = preferenceRetunDTO.payer();
         //this.payment_methods = preferenceRetunDTO.payment_methods();
-        this.processing_modes = preferenceRetunDTO.processing_modes().toString();
-        this.product_id = preferenceRetunDTO.product_id().toString();
+        this.processing_modes = preferenceRetunDTO.processing_modes()!=null ? preferenceRetunDTO.processing_modes().toString():null;
+        this.product_id = preferenceRetunDTO.product_id()!=null ? preferenceRetunDTO.product_id().toString():null;
         //this.redirect_urls = preferenceRetunDTO.redirect_urls();
         this.sandbox_init_point = preferenceRetunDTO.sandbox_init_point();
         this.site_id = preferenceRetunDTO.site_id();
-        this.shipments = preferenceRetunDTO.shipments().toString();
-        this.total_amount = preferenceRetunDTO.total_amount().toString();
+        this.shipments = preferenceRetunDTO.shipments()!=null ? preferenceRetunDTO.shipments().toString():null;
+        this.total_amount = preferenceRetunDTO.total_amount()!=null ? preferenceRetunDTO.total_amount().toString():null;
         this.last_updated = preferenceRetunDTO.last_updated();
         this.statement_descriptor = preferenceRetunDTO.statement_descriptor();
     }

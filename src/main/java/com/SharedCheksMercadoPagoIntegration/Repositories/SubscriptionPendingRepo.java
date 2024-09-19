@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface SubscriptionPendentRepo extends JpaRepository<SubscribeOrderPendind, UUID> {
+public interface SubscriptionPendingRepo extends JpaRepository<SubscribeOrderPendind, UUID> {
 
     List<SubscribeOrderPendind> findByEmailProfileID(String email);
 }
