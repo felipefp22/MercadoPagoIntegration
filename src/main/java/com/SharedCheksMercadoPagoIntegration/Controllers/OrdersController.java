@@ -30,7 +30,7 @@ public class OrdersController {
         return ordersService.createOrder(payerDTO, kindOfSubscription.getItemsDTO());
     }
 
-    @PostMapping("/create/{kindOfSubscription}")
+    @PutMapping("/cancel-and-create-new-order/{kindOfSubscription}")
     public PreferenceRetunDTO cancelAndCreateNewOrder(@RequestBody PayerDTO payerDTO,
                                                       @PathVariable KindOfSubscription kindOfSubscription) {
         if (payerDTO.email() == null) throw new IllegalArgumentException("Email is required");

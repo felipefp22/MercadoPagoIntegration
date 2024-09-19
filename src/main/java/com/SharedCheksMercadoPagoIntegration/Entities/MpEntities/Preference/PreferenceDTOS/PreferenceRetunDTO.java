@@ -27,7 +27,7 @@ public record PreferenceRetunDTO(
         String notification_url,
         String operation_type,
         PayerDTO payer,
-        PaymentMethods payment_methods,
+        PaymentMethodsDTO payment_methods,
         Object processing_modes,
         Object product_id,
         BackUrlsDTO redirect_urls,

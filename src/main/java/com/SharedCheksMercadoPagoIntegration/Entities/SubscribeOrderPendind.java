@@ -4,6 +4,7 @@ import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PreferenceRetunDTO;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceInfos;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class SubscribeOrderPendind {
     private String mercadoPagoID;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private PreferenceRetunDTO preferenceInfos;
+    private PreferenceInfos preferenceInfos;
 
     // <>---------------- Constructors ----------------<>
     public SubscribeOrderPendind() {
@@ -82,11 +83,11 @@ public class SubscribeOrderPendind {
         this.mercadoPagoID = mercadoPagoID;
     }
 
-    public PreferenceRetunDTO getPreferenceInfos() {
+    public PreferenceInfos getPreferenceInfos() {
         return preferenceInfos;
     }
 
-    public void setPreferenceInfos(PreferenceRetunDTO preferenceInfos) {
+    public void setPreferenceInfos(PreferenceInfos preferenceInfos) {
         this.preferenceInfos = preferenceInfos;
     }
 }

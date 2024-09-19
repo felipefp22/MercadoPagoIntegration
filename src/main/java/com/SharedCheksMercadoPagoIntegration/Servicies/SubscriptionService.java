@@ -148,6 +148,7 @@ public class SubscriptionService {
             MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
 
             if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
+
                 movePendingSubscriptionToPaidAndActivateSubscription(x, merchantOrderDTO);
             }
         });

@@ -2,7 +2,7 @@ package com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.Pre
 
 import java.util.List;
 
-public record PaymentMethods(
+public record PaymentMethodsDTO(
         List<ExcludedPaymentMethods> excluded_payment_methods
 
 ) {

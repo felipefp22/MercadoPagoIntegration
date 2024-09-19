@@ -2,6 +2,7 @@ package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PreferenceRetunDTO;
+import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceInfos;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class SubscribeOrderCancelled {
     private String mercadoPagoID;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private PreferenceRetunDTO preferenceInfos;
+    private PreferenceInfos preferenceInfos;
 
     // <>---------------- Constructors ----------------<>
     public SubscribeOrderCancelled() {

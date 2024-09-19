@@ -5,13 +5,11 @@ import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.Pref
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-import java.util.List;
-
 @Entity
 public class PreferenceInfos {
     private String addtional_info;
     private String auto_return;
-    private BackUrlsDTO back_urls;
+    //private BackUrlsDTO back_urls;
     private Boolean binary_mode;
     private Long client_id;
     private Long collector_id;
@@ -28,16 +26,16 @@ public class PreferenceInfos {
     private String id;
     private String init_point;
     private String internal_metadata; //object
-    private List<ItemsDTO> items;
+    //private List<ItemsDTO> items;
     private Long marketplace_fee;
     private String metadata; //object
     private String notification_url;
     private String operation_type;
-    private PayerDTO payer;
-    private PaymentMethods payment_methods;
+    //private PayerDTO payer;
+    //private PaymentMethodsDTO payment_methods;
     private String processing_modes; //object
     private String product_id;  //object
-    private BackUrlsDTO redirect_urls;
+    //private BackUrlsDTO redirect_urls;
     private String sandbox_init_point;
     private String site_id;
     private String shipments;  //object
@@ -51,7 +49,7 @@ public class PreferenceInfos {
     public PreferenceInfos(PreferenceRetunDTO preferenceRetunDTO){
         this.addtional_info = preferenceRetunDTO.addtional_info();
         this.auto_return = preferenceRetunDTO.auto_return();
-        this.back_urls = preferenceRetunDTO.back_urls();
+        //this.back_urls = preferenceRetunDTO.back_urls();
         this.binary_mode = preferenceRetunDTO.binary_mode();
         this.client_id = preferenceRetunDTO.client_id();
         this.collector_id = preferenceRetunDTO.collector_id();
@@ -66,16 +64,16 @@ public class PreferenceInfos {
         this.id = preferenceRetunDTO.id();
         this.init_point = preferenceRetunDTO.init_point();
         this.internal_metadata = preferenceRetunDTO.internal_metadata().toString();
-        this.items = preferenceRetunDTO.items();
+        //this.items = preferenceRetunDTO.items();
         this.marketplace_fee = preferenceRetunDTO.marketplace_fee();
         this.metadata = preferenceRetunDTO.metadata().toString().toString();
         this.notification_url = preferenceRetunDTO.notification_url();
         this.operation_type = preferenceRetunDTO.operation_type();
-        this.payer = preferenceRetunDTO.payer();
-        this.payment_methods = preferenceRetunDTO.payment_methods();
+        //this.payer = preferenceRetunDTO.payer();
+        //this.payment_methods = preferenceRetunDTO.payment_methods();
         this.processing_modes = preferenceRetunDTO.processing_modes().toString();
         this.product_id = preferenceRetunDTO.product_id().toString();
-        this.redirect_urls = preferenceRetunDTO.redirect_urls();
+        //this.redirect_urls = preferenceRetunDTO.redirect_urls();
         this.sandbox_init_point = preferenceRetunDTO.sandbox_init_point();
         this.site_id = preferenceRetunDTO.site_id();
         this.shipments = preferenceRetunDTO.shipments().toString();
@@ -95,9 +93,9 @@ public class PreferenceInfos {
         return auto_return;
     }
 
-    public BackUrlsDTO getBack_urls() {
-        return back_urls;
-    }
+//    public BackUrlsDTO getBack_urls() {
+//        return back_urls;
+//    }
 
     public Boolean getBinary_mode() {
         return binary_mode;
@@ -155,9 +153,9 @@ public class PreferenceInfos {
         return internal_metadata;
     }
 
-    public List<ItemsDTO> getItems() {
-        return items;
-    }
+//    public List<ItemsDTO> getItems() {
+//        return items;
+//    }
 
     public Long getMarketplace_fee() {
         return marketplace_fee;
@@ -175,13 +173,13 @@ public class PreferenceInfos {
         return operation_type;
     }
 
-    public PayerDTO getPayer() {
-        return payer;
-    }
+//    public PayerDTO getPayer() {
+//        return payer;
+//    }
 
-    public PaymentMethods getPayment_methods() {
-        return payment_methods;
-    }
+//    public PaymentMethodsDTO getPayment_methods() {
+//        return payment_methods;
+//    }
 
     public Object getProcessing_modes() {
         return processing_modes;
@@ -191,9 +189,9 @@ public class PreferenceInfos {
         return product_id;
     }
 
-    public BackUrlsDTO getRedirect_urls() {
-        return redirect_urls;
-    }
+//    public BackUrlsDTO getRedirect_urls() {
+//        return redirect_urls;
+//    }
 
     public String getSandbox_init_point() {
         return sandbox_init_point;
