@@ -1,7 +1,7 @@
 package com.SharedCheksMercadoPagoIntegration.Controllers;
 
 
-import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
+import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfPremium;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PreferenceRetunDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
@@ -22,24 +22,24 @@ public class OrdersController {
     }
 
     // <>-------------- Methods --------------<>
-    @PostMapping("/create/{kindOfSubscription}")
+    @PostMapping("/create/{kindOfPremium}")
     public PreferenceRetunDTO create(@RequestBody PayerDTO payerDTO,
-                                     @PathVariable KindOfSubscription kindOfSubscription) {
+                                     @PathVariable KindOfPremium kindOfPremium) {
         if (payerDTO.email() == null) throw new IllegalArgumentException("Email is required");
 
-        return ordersService.createOrder(payerDTO, kindOfSubscription.getItemsDTO());
+        return ordersService.createOrder(payerDTO, kindOfPremium.getItemsDTO());
     }
 
-    @PutMapping("/cancel-and-create-new-order/{kindOfSubscription}")
+    @PutMapping("/cancel-and-create-new-order/{kindOfPremium}")
     public PreferenceRetunDTO cancelAndCreateNewOrder(@RequestBody PayerDTO payerDTO,
-                                                      @PathVariable KindOfSubscription kindOfSubscription) {
+                                                      @PathVariable KindOfPremium kindOfPremium) {
         if (payerDTO.email() == null) throw new IllegalArgumentException("Email is required");
         SubscribeOrderPendind subscribeOrderPendindFound =
                 subscriptionPendingRepo.findByEmailProfileID(payerDTO.email()).stream().findFirst().orElse(null);
 
         ordersService.cancelAndExpireNoFurtherOrder(subscribeOrderPendindFound);
 
-        return ordersService.createOrder(payerDTO, kindOfSubscription.getItemsDTO());
+        return ordersService.createOrder(payerDTO, kindOfPremium.getItemsDTO());
     }
 
 }

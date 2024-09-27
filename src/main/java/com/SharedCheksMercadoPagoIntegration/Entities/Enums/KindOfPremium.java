@@ -2,7 +2,7 @@ package com.SharedCheksMercadoPagoIntegration.Entities.Enums;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 
-public enum KindOfSubscription {
+public enum KindOfPremium {
     PREMIUMTESTE("PremiumTeste", 1, new ItemsDTO("Assinatura 0 days", "BRL", 1, 0.01, "PREMIUMTESTE")),
     PREMIUM30("Premium30", 30, new ItemsDTO("Assinatura 30 days", "BRL", 1, 9.99, "PREMIUM30")),
     PREMIUM90("Premium90", 90, new ItemsDTO("Assinatura 90 days", "BRL", 1, 26.99, "PREMIUM90")),
@@ -12,7 +12,7 @@ public enum KindOfSubscription {
     private final int days;
     private final ItemsDTO itemsDTO;
 
-    KindOfSubscription(String kindOfSubscription, int days, ItemsDTO itemsDTO) {
+    KindOfPremium(String kindOfSubscription, int days, ItemsDTO itemsDTO) {
         this.kindOfSubscription = kindOfSubscription;
         this.days = days;
         this.itemsDTO = itemsDTO;

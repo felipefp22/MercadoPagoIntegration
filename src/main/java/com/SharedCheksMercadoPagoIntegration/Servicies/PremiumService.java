@@ -11,7 +11,6 @@ import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendingRep
 import jakarta.transaction.Transactional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,13 +25,13 @@ import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLi
 import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLinkRequestSharedChecks.requisitionGenericSharedChecks;
 
 @Service
-public class SubscriptionService {
+public class PremiumService {
 
     private final SubscriptionPendingRepo subscriptionPendingRepo;
     private final SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo;
     private final SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo;
 
-    public SubscriptionService(SubscriptionPendingRepo subscriptionPendingRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo1, SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo) {
+    public PremiumService(SubscriptionPendingRepo subscriptionPendingRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo1, SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo) {
         this.subscriptionPendingRepo = subscriptionPendingRepo;
         this.subscriptionPaidAndActiveRepo = subscriptionPaidAndActiveRepo1;
         this.subscriptionPaidAndExpiredRepo = subscriptionPaidAndExpiredRepo;
@@ -71,8 +70,8 @@ public class SubscriptionService {
 
 
     @Transactional
-    private void movePendingSubscriptionToPaidAndActivateSubscription(SubscribeOrderPendind subscribeOrderPendindPendingToChange,
-                                                                      MerchantOrderDTO merchantOrderDTO) {
+    public void movePendingSubscriptionToPaidAndActivateSubscription(SubscribeOrderPendind subscribeOrderPendindPendingToChange,
+                                                                     MerchantOrderDTO merchantOrderDTO) {
         var subscribeOrderPaidAndActiveToSave = new SubscribeOrderPaidAndActive(subscribeOrderPendindPendingToChange);
 
         subscribeOrderPaidAndActiveToSave.setStatus("PAID");
@@ -133,7 +132,7 @@ public class SubscriptionService {
     }
 
     // <>-------------- Routines --------------<>
-    @Scheduled(fixedDelay = 6000000)
+    //@Scheduled(fixedDelay = 6000000)
     public void verifyWithMpIfHadNewPayment() {
 
         List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendingRepo.findAll();
@@ -155,7 +154,7 @@ public class SubscriptionService {
     }
 
 
-    @Scheduled(fixedDelay = 21600000)
+    //@Scheduled(fixedDelay = 21600000)
     @Transactional
     public void takingOutExpiredSubscriptions() {
         List<SubscribeOrderPaidAndActive> subscriptionPaidRepo = subscriptionPaidAndActiveRepo.findAll();

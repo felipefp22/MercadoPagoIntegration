@@ -1,6 +1,6 @@
 package com.SharedCheksMercadoPagoIntegration.Entities;
 
-import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
+import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfPremium;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceInfos;
@@ -22,7 +22,7 @@ public class SubscribeOrderPendind {
     private LocalDateTime updatedExpirationAtUTC;
 
     private Double value;
-    private KindOfSubscription kindOfSubscription;
+    private KindOfPremium kindOfPremium;
     private String ticketUsed;
 
     private String mercadoPagoID;
@@ -41,7 +41,7 @@ public class SubscribeOrderPendind {
         this.createdAtUTC = LocalDateTime.now(ZoneOffset.UTC);
         this.updatedExpirationAtUTC = this.createdAtUTC;
         this.value = itemsDTO.unit_price();
-        this.kindOfSubscription = KindOfSubscription.valueOf(itemsDTO.title());
+        this.kindOfPremium = KindOfPremium.valueOf(itemsDTO.title());
     }
 
 
@@ -79,8 +79,8 @@ public class SubscribeOrderPendind {
         return value;
     }
 
-    public KindOfSubscription getKindOfSubscription() {
-        return kindOfSubscription;
+    public KindOfPremium getKindOfSubscription() {
+        return kindOfPremium;
     }
 
     public String getMercadoPagoID() {

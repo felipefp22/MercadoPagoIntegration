@@ -1,6 +1,6 @@
 package com.SharedCheksMercadoPagoIntegration.Entities;
 
-import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfSubscription;
+import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfPremium;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceInfos;
 import jakarta.persistence.*;
 
@@ -19,7 +19,7 @@ public class SubscribeOrderCancelled {
     private LocalDateTime getUpdatedExpirationAtUTC;
 
     private Double value;
-    private KindOfSubscription kindOfSubscription;
+    private KindOfPremium kindOfPremium;
     private String ticketUsed;
 
     private String mercadoPagoID;
@@ -38,7 +38,7 @@ public class SubscribeOrderCancelled {
         this.createdAtUTC = subscribeOrderPendind.getCreatedAtUTC();
         this.getUpdatedExpirationAtUTC = subscribeOrderPendind.getUpdatedExpirationAtUTC();
         this.value = subscribeOrderPendind.getValue();
-        this.kindOfSubscription = subscribeOrderPendind.getKindOfSubscription();
+        this.kindOfPremium = subscribeOrderPendind.getKindOfSubscription();
         this.mercadoPagoID = subscribeOrderPendind.getMercadoPagoID();
         this.preferenceInfos = subscribeOrderPendind.getPreferenceInfos();
     }
@@ -80,8 +80,8 @@ public class SubscribeOrderCancelled {
         return value;
     }
 
-    public KindOfSubscription getKindOfSubscription() {
-        return kindOfSubscription;
+    public KindOfPremium getKindOfSubscription() {
+        return kindOfPremium;
     }
 
     public String getMercadoPagoID() {

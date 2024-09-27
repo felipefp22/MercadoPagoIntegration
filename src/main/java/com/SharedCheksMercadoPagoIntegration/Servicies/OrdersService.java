@@ -150,7 +150,7 @@ public class OrdersService {
     }
 
     // <>-------------- Routines --------------<>
-    @Scheduled(fixedDelay = 5000)
+    //@Scheduled(fixedDelay = 5000)
     public void moveOldOrdersNotPaidToCancelledRepo() {
         List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendingRepo.findAll();
 

@@ -1,6 +1,6 @@
 package com.SharedCheksMercadoPagoIntegration.Controllers;
 
-import com.SharedCheksMercadoPagoIntegration.Servicies.SubscriptionService;
+import com.SharedCheksMercadoPagoIntegration.Servicies.PremiumService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/verify-subscription")
-public class SubscriptionController {
-    private final SubscriptionService subscriptionService;
+public class PremiumController {
+    private final PremiumService premiumService;
 
-    public SubscriptionController(SubscriptionService subscriptionService) {
-        this.subscriptionService = subscriptionService;
+    public PremiumController(PremiumService premiumService) {
+        this.premiumService = premiumService;
     }
 
     // <>-------------- Methods --------------<>
@@ -20,7 +20,7 @@ public class SubscriptionController {
     @GetMapping("/verify-if-have-active-subscription/{email}")
     public String verifyIfHaveActiveSubscription(@PathVariable String email) {
 
-        return subscriptionService.verifyIfHaveActiveSubscription(email);
+        return premiumService.verifyIfHaveActiveSubscription(email);
     }
 
 }

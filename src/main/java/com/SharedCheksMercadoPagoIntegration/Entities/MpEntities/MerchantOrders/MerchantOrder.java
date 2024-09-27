@@ -40,7 +40,7 @@ public class MerchantOrder {
     public MerchantOrder(MerchantOrderDTO merchantOrderDTO){
         this.id = merchantOrderDTO.id();
         this.status = merchantOrderDTO.status();
-        this.external_reference = merchantOrderDTO.external_referen();
+        this.external_reference = merchantOrderDTO.external_reference();
         this.preference_id = merchantOrderDTO.preference_id();
         this.paymentsids = merchantOrderDTO.payments().stream().map(PaymentsDTO::id).collect(Collectors.toList());
         this.marketplace = merchantOrderDTO.marketplace();
