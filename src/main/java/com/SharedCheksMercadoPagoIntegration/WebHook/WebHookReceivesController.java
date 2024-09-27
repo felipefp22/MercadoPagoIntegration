@@ -5,6 +5,7 @@ import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.
 import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
 import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendingRepo;
 import com.SharedCheksMercadoPagoIntegration.Servicies.PremiumService;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -31,25 +32,28 @@ public class WebHookReceivesController {
     // <>-------------- Methods --------------<>
 
     @PostMapping("/mp-payments")
-    public ResponseEntity receiveMpPayments(@RequestBody Object object) {
+    public ResponseEntity receiveMpPayments(@RequestBody WebHookDTO webHookDTO) {
 
-        System.out.println(object.toString());
-//        MerchantOrdersThroughElementsDTO merchantOrderElements =
-//                requisitionGenericMP("/merchant_orders/" + x.getOrderID().toString(),
-//                        HttpMethod.GET, null,
-//                        new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
-//                        }, null);
-//
-//        MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
-//
-//        SubscribeOrderPendind subscriptionsPendind =
-//                subscriptionPendingRepo.findById(UUID.fromString(merchantOrderDTO.external_reference())).orElse(null);
-//
-//        if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
-//
-//            premiumService.movePendingSubscriptionToPaidAndActivateSubscription(subscriptionsPendind, merchantOrderDTO);
-//        }
+        System.out.println(webHookDTO.toString());
 
-        return ResponseEntity.ok().build();
+        if (webHookDTO.status().equals("closed")) {
+            MerchantOrderDTO merchantOrderDTO =
+                    requisitionGenericMP("/merchant_orders/" + webHookDTO.id(),
+                            HttpMethod.GET, null,
+                            new ParameterizedTypeReference<MerchantOrderDTO>() {
+                            }, null);
+
+            //MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
+
+            SubscribeOrderPendind subscriptionsPendind =
+                    subscriptionPendingRepo.findById(UUID.fromString(merchantOrderDTO.external_reference())).orElse(null);
+
+            if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
+
+                premiumService.movePendingSubscriptionToPaidAndActivateSubscription(subscriptionsPendind, merchantOrderDTO);
+            }
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 }
