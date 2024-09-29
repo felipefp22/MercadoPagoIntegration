@@ -1,9 +1,8 @@
 package com.SharedCheksMercadoPagoIntegration.WebHook;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrderDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrdersThroughElementsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
-import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendingRepo;
+import com.SharedCheksMercadoPagoIntegration.Entities.PremiumOrderPendind;
+import com.SharedCheksMercadoPagoIntegration.Repositories.PremiumPendingRepo;
 import com.SharedCheksMercadoPagoIntegration.Servicies.PremiumService;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,11 +21,11 @@ import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLi
 @RequestMapping("/webhook-receives")
 public class WebHookReceivesController {
     private final PremiumService premiumService;
-    private final SubscriptionPendingRepo subscriptionPendingRepo;
+    private final PremiumPendingRepo premiumPendingRepo;
 
-    public WebHookReceivesController(PremiumService premiumService, SubscriptionPendingRepo subscriptionPendingRepo) {
+    public WebHookReceivesController(PremiumService premiumService, PremiumPendingRepo premiumPendingRepo) {
         this.premiumService = premiumService;
-        this.subscriptionPendingRepo = subscriptionPendingRepo;
+        this.premiumPendingRepo = premiumPendingRepo;
     }
 
     // <>-------------- Methods --------------<>
@@ -45,8 +44,8 @@ public class WebHookReceivesController {
 
             //MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
 
-            SubscribeOrderPendind subscriptionsPendind =
-                    subscriptionPendingRepo.findById(UUID.fromString(merchantOrderDTO.external_reference())).orElse(null);
+            PremiumOrderPendind subscriptionsPendind =
+                    premiumPendingRepo.findById(UUID.fromString(merchantOrderDTO.external_reference())).orElse(null);
 
             if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
 

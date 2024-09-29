@@ -2,15 +2,16 @@ package com.SharedCheksMercadoPagoIntegration.Servicies;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrderDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.MerchantOrders.MerchantOrdersDTOs.MerchantOrdersThroughElementsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPaidAndActive;
-import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPaidAndExpired;
-import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
-import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPaidAndActiveRepo;
-import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPaidAndExpiredRepo;
-import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendingRepo;
+import com.SharedCheksMercadoPagoIntegration.Entities.PremiumOrderPaidAndActive;
+import com.SharedCheksMercadoPagoIntegration.Entities.PremiumOrderPaidAndExpired;
+import com.SharedCheksMercadoPagoIntegration.Entities.PremiumOrderPendind;
+import com.SharedCheksMercadoPagoIntegration.Repositories.PremiumPaidAndActiveRepo;
+import com.SharedCheksMercadoPagoIntegration.Repositories.PremiumPaidAndExpiredRepo;
+import com.SharedCheksMercadoPagoIntegration.Repositories.PremiumPendingRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,14 +28,14 @@ import static com.SharedCheksMercadoPagoIntegration.Infra.webRequest.WebClientLi
 @Service
 public class PremiumService {
 
-    private final SubscriptionPendingRepo subscriptionPendingRepo;
-    private final SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo;
-    private final SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo;
+    private final PremiumPendingRepo premiumPendingRepo;
+    private final PremiumPaidAndActiveRepo premiumPaidAndActiveRepo;
+    private final PremiumPaidAndExpiredRepo premiumPaidAndExpiredRepo;
 
-    public PremiumService(SubscriptionPendingRepo subscriptionPendingRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo, SubscriptionPaidAndActiveRepo subscriptionPaidAndActiveRepo1, SubscriptionPaidAndExpiredRepo subscriptionPaidAndExpiredRepo) {
-        this.subscriptionPendingRepo = subscriptionPendingRepo;
-        this.subscriptionPaidAndActiveRepo = subscriptionPaidAndActiveRepo1;
-        this.subscriptionPaidAndExpiredRepo = subscriptionPaidAndExpiredRepo;
+    public PremiumService(PremiumPendingRepo premiumPendingRepo, PremiumPaidAndActiveRepo premiumPaidAndActiveRepo, PremiumPaidAndActiveRepo premiumPaidAndActiveRepo1, PremiumPaidAndExpiredRepo premiumPaidAndExpiredRepo) {
+        this.premiumPendingRepo = premiumPendingRepo;
+        this.premiumPaidAndActiveRepo = premiumPaidAndActiveRepo1;
+        this.premiumPaidAndExpiredRepo = premiumPaidAndExpiredRepo;
     }
 
     // <>-------------- Methods --------------<>
@@ -42,7 +43,7 @@ public class PremiumService {
     public String verifyIfHaveActiveSubscription(String email) {
         verifyWithMpIfHadNewPaymentEspecificUser(email);
 
-        SubscribeOrderPaidAndActive subscriptionActive = subscriptionPaidAndActiveRepo.findByEmailProfileID(email)
+        PremiumOrderPaidAndActive subscriptionActive = premiumPaidAndActiveRepo.findByEmailProfileID(email)
                 .stream().findFirst().orElse(null);
 
         if (subscriptionActive != null && subscriptionActive.getValidTillUTC().isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
@@ -51,7 +52,7 @@ public class PremiumService {
 
             return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
         } else {
-            SubscribeOrderPendind subscriptionPending = subscriptionPendingRepo.findByEmailProfileID(email)
+            PremiumOrderPendind subscriptionPending = premiumPendingRepo.findByEmailProfileID(email)
                     .stream().findFirst().orElseThrow(() -> new RuntimeException("No subscription found"));
 
             var externalReference = subscriptionPending.getOrderID();
@@ -70,22 +71,22 @@ public class PremiumService {
 
 
     @Transactional
-    public void movePendingSubscriptionToPaidAndActivateSubscription(SubscribeOrderPendind subscribeOrderPendindPendingToChange,
+    public void movePendingSubscriptionToPaidAndActivateSubscription(PremiumOrderPendind premiumOrderPendindPendingToChange,
                                                                      MerchantOrderDTO merchantOrderDTO) {
-        var subscribeOrderPaidAndActiveToSave = new SubscribeOrderPaidAndActive(subscribeOrderPendindPendingToChange);
+        var subscribeOrderPaidAndActiveToSave = new PremiumOrderPaidAndActive(premiumOrderPendindPendingToChange);
 
         subscribeOrderPaidAndActiveToSave.setStatus("PAID");
         subscribeOrderPaidAndActiveToSave.setPaidAtUTC(
                 takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
         subscribeOrderPaidAndActiveToSave.setValidTillUTC(
                 takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
-                        .plusDays(subscribeOrderPendindPendingToChange.getKindOfSubscription().getDays()));
+                        .plusDays(premiumOrderPendindPendingToChange.getKindOfSubscription().getDays()));
 
         subscribeOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
 
         // Persisting in DB
-        SubscribeOrderPaidAndActive subscribeOrderToActivate = subscriptionPaidAndActiveRepo.save(subscribeOrderPaidAndActiveToSave);
-        subscriptionPendingRepo.deleteById(subscribeOrderToActivate.getOrderID());
+        PremiumOrderPaidAndActive subscribeOrderToActivate = premiumPaidAndActiveRepo.save(subscribeOrderPaidAndActiveToSave);
+        premiumPendingRepo.deleteById(subscribeOrderToActivate.getOrderID());
 
         // Activate User subscription in main API
         activateSubscriptionForUserMainAPI(subscribeOrderToActivate);
@@ -93,8 +94,8 @@ public class PremiumService {
 
     public void verifyWithMpIfHadNewPaymentEspecificUser(String emailID) {
 
-        SubscribeOrderPendind subscriptionsPendind =
-                subscriptionPendingRepo.findByEmailProfileID(emailID).stream().findFirst().orElse(null);
+        PremiumOrderPendind subscriptionsPendind =
+                premiumPendingRepo.findByEmailProfileID(emailID).stream().findFirst().orElse(null);
 
         if (subscriptionsPendind != null) {
             MerchantOrdersThroughElementsDTO merchantOrderElements =
@@ -112,10 +113,10 @@ public class PremiumService {
         }
     }
 
-    private void activateSubscriptionForUserMainAPI(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive) {
+    private void activateSubscriptionForUserMainAPI(PremiumOrderPaidAndActive premiumOrderPaidAndActive) {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("validUntillUTC", subscribeOrderPaidAndActive.getValidTillUTC().toString());
-        headers.put("userID", subscribeOrderPaidAndActive.getEmailProfileID());
+        headers.put("validUntillUTC", premiumOrderPaidAndActive.getValidTillUTC().toString());
+        headers.put("userID", premiumOrderPaidAndActive.getEmailProfileID());
 
         requisitionGenericSharedChecks("/internal-subscription-actions/activate-subscription",
                 HttpMethod.POST, null,
@@ -132,10 +133,10 @@ public class PremiumService {
     }
 
     // <>-------------- Routines --------------<>
-    //@Scheduled(fixedDelay = 6000000)
+    @Scheduled(fixedDelay = 6000000)
     public void verifyWithMpIfHadNewPayment() {
 
-        List<SubscribeOrderPendind> subscriptionsPendind = subscriptionPendingRepo.findAll();
+        List<PremiumOrderPendind> subscriptionsPendind = premiumPendingRepo.findAll();
 
         subscriptionsPendind.forEach(x -> {
             MerchantOrdersThroughElementsDTO merchantOrderElements =
@@ -154,16 +155,16 @@ public class PremiumService {
     }
 
 
-    //@Scheduled(fixedDelay = 21600000)
+    @Scheduled(fixedDelay = 21600000)
     @Transactional
     public void takingOutExpiredSubscriptions() {
-        List<SubscribeOrderPaidAndActive> subscriptionPaidRepo = subscriptionPaidAndActiveRepo.findAll();
+        List<PremiumOrderPaidAndActive> subscriptionPaidRepo = premiumPaidAndActiveRepo.findAll();
 
         subscriptionPaidRepo.forEach(x -> {
             if (x.getValidTillUTC().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
                 x.setStatus("PAIDANDEXPIRED");
-                var subscriptionPaidAndExpiredSaved = subscriptionPaidAndExpiredRepo.save(new SubscribeOrderPaidAndExpired(x));
-                subscriptionPaidAndActiveRepo.deleteById(subscriptionPaidAndExpiredSaved.getOrderID());
+                var subscriptionPaidAndExpiredSaved = premiumPaidAndExpiredRepo.save(new PremiumOrderPaidAndExpired(x));
+                premiumPaidAndActiveRepo.deleteById(subscriptionPaidAndExpiredSaved.getOrderID());
 
                 // Deactivate User subscription in main API
 //                requisitionGenericSharedChecks("/internal-subscription-actions/deactivate-subscription",

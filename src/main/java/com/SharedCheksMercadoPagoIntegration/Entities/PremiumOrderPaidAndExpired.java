@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-public class SubscribeOrderPaidAndExpired {
+public class PremiumOrderPaidAndExpired {
 
     @Id
     private UUID orderID;
@@ -31,20 +31,20 @@ public class SubscribeOrderPaidAndExpired {
     private MerchantOrder merchantOrder;
 
     // <>---------------- Constructors ----------------<>
-    public SubscribeOrderPaidAndExpired() {
+    public PremiumOrderPaidAndExpired() {
     }
-    public SubscribeOrderPaidAndExpired(SubscribeOrderPaidAndActive subscribeOrderPaidAndActive){
-        this.orderID = subscribeOrderPaidAndActive.getOrderID();
-        this.emailProfileID = subscribeOrderPaidAndActive.getEmailProfileID();
-        this.status = subscribeOrderPaidAndActive.getStatus();
-        this.createdAtUTC = subscribeOrderPaidAndActive.getCreatedAtUTC();
-        this.getUpdatedExpirationAtUTC = subscribeOrderPaidAndActive.getGetUpdatedExpirationAtUTC();
-        this.paidAtUTC = subscribeOrderPaidAndActive.getPaidAtUTC();
-        this.validTillUTC = subscribeOrderPaidAndActive.getValidTillUTC();
-        this.value = subscribeOrderPaidAndActive.getValue();
-        this.kindOfPremium = subscribeOrderPaidAndActive.getKindOfSubscription();
-        this.mercadoPagoID = subscribeOrderPaidAndActive.getMercadoPagoID();
-        this.merchantOrder = subscribeOrderPaidAndActive.getMerchantOrder();
+    public PremiumOrderPaidAndExpired(PremiumOrderPaidAndActive premiumOrderPaidAndActive){
+        this.orderID = premiumOrderPaidAndActive.getOrderID();
+        this.emailProfileID = premiumOrderPaidAndActive.getEmailProfileID();
+        this.status = premiumOrderPaidAndActive.getStatus();
+        this.createdAtUTC = premiumOrderPaidAndActive.getCreatedAtUTC();
+        this.getUpdatedExpirationAtUTC = premiumOrderPaidAndActive.getGetUpdatedExpirationAtUTC();
+        this.paidAtUTC = premiumOrderPaidAndActive.getPaidAtUTC();
+        this.validTillUTC = premiumOrderPaidAndActive.getValidTillUTC();
+        this.value = premiumOrderPaidAndActive.getValue();
+        this.kindOfPremium = premiumOrderPaidAndActive.getKindOfSubscription();
+        this.mercadoPagoID = premiumOrderPaidAndActive.getMercadoPagoID();
+        this.merchantOrder = premiumOrderPaidAndActive.getMerchantOrder();
     }
 
 

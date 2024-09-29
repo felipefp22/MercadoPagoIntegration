@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-public class SubscribeOrderPaidAndActive {
+public class PremiumOrderPaidAndActive {
 
     @Id
     private UUID orderID;
@@ -30,17 +30,17 @@ public class SubscribeOrderPaidAndActive {
     private MerchantOrder merchantOrder;
 
     // <>---------------- Constructors ----------------<>
-    public SubscribeOrderPaidAndActive() {
+    public PremiumOrderPaidAndActive() {
     }
-    public SubscribeOrderPaidAndActive(SubscribeOrderPendind subscribeOrderPendind){
-        this.orderID = subscribeOrderPendind.getOrderID();
-        this.emailProfileID = subscribeOrderPendind.getEmailProfileID();
-        this.status = subscribeOrderPendind.getStatus();
-        this.createdAtUTC = subscribeOrderPendind.getCreatedAtUTC();
-        this.getUpdatedExpirationAtUTC = subscribeOrderPendind.getUpdatedExpirationAtUTC();
-        this.value = subscribeOrderPendind.getValue();
-        this.kindOfPremium = subscribeOrderPendind.getKindOfSubscription();
-        this.mercadoPagoID = subscribeOrderPendind.getMercadoPagoID();
+    public PremiumOrderPaidAndActive(PremiumOrderPendind premiumOrderPendind){
+        this.orderID = premiumOrderPendind.getOrderID();
+        this.emailProfileID = premiumOrderPendind.getEmailProfileID();
+        this.status = premiumOrderPendind.getStatus();
+        this.createdAtUTC = premiumOrderPendind.getCreatedAtUTC();
+        this.getUpdatedExpirationAtUTC = premiumOrderPendind.getUpdatedExpirationAtUTC();
+        this.value = premiumOrderPendind.getValue();
+        this.kindOfPremium = premiumOrderPendind.getKindOfSubscription();
+        this.mercadoPagoID = premiumOrderPendind.getMercadoPagoID();
     }
 
 

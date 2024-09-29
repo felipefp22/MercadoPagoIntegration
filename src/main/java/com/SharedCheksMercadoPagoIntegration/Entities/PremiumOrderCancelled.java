@@ -1,17 +1,14 @@
 package com.SharedCheksMercadoPagoIntegration.Entities;
 
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfPremium;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.ItemsDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceInfos;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Entity
-public class SubscribeOrderPendind {
+public class PremiumOrderCancelled {
 
     @Id
     private UUID orderID;
@@ -19,7 +16,7 @@ public class SubscribeOrderPendind {
     private String emailProfileID;
     private String status;
     private LocalDateTime createdAtUTC;
-    private LocalDateTime updatedExpirationAtUTC;
+    private LocalDateTime getUpdatedExpirationAtUTC;
 
     private Double value;
     private KindOfPremium kindOfPremium;
@@ -31,17 +28,19 @@ public class SubscribeOrderPendind {
     private PreferenceInfos preferenceInfos;
 
     // <>---------------- Constructors ----------------<>
-    public SubscribeOrderPendind() {
+    public PremiumOrderCancelled() {
     }
 
-    public SubscribeOrderPendind(PayerDTO payerDTO, ItemsDTO itemsDTO) {
-        this.orderID = UUID.randomUUID();
-        this.emailProfileID = payerDTO.email();
+    public PremiumOrderCancelled(PremiumOrderPendind premiumOrderPendind){
+        this.orderID = premiumOrderPendind.getOrderID();
+        this.emailProfileID = premiumOrderPendind.getEmailProfileID();
         this.status = "";
-        this.createdAtUTC = LocalDateTime.now(ZoneOffset.UTC);
-        this.updatedExpirationAtUTC = this.createdAtUTC;
-        this.value = itemsDTO.unit_price();
-        this.kindOfPremium = KindOfPremium.valueOf(itemsDTO.title());
+        this.createdAtUTC = premiumOrderPendind.getCreatedAtUTC();
+        this.getUpdatedExpirationAtUTC = premiumOrderPendind.getUpdatedExpirationAtUTC();
+        this.value = premiumOrderPendind.getValue();
+        this.kindOfPremium = premiumOrderPendind.getKindOfSubscription();
+        this.mercadoPagoID = premiumOrderPendind.getMercadoPagoID();
+        this.preferenceInfos = premiumOrderPendind.getPreferenceInfos();
     }
 
 
@@ -51,6 +50,7 @@ public class SubscribeOrderPendind {
     public UUID getOrderID() {
         return orderID;
     }
+
 
     public String getEmailProfileID() {
         return emailProfileID;
@@ -68,11 +68,12 @@ public class SubscribeOrderPendind {
         return createdAtUTC;
     }
 
-    public LocalDateTime getUpdatedExpirationAtUTC() {
-        return updatedExpirationAtUTC;
+    public LocalDateTime getGetUpdatedExpirationAtUTC() {
+        return getUpdatedExpirationAtUTC;
     }
-    public void setUpdatedExpirationAtUTC(LocalDateTime updatedExpirationAtUTC) {
-        this.updatedExpirationAtUTC = updatedExpirationAtUTC;
+
+    public void setGetUpdatedExpirationAtUTC(LocalDateTime getUpdatedExpirationAtUTC) {
+        this.getUpdatedExpirationAtUTC = getUpdatedExpirationAtUTC;
     }
 
     public Double getValue() {
@@ -89,14 +90,6 @@ public class SubscribeOrderPendind {
 
     public void setMercadoPagoID(String mercadoPagoID) {
         this.mercadoPagoID = mercadoPagoID;
-    }
-
-    public PreferenceInfos getPreferenceInfos() {
-        return preferenceInfos;
-    }
-
-    public void setPreferenceInfos(PreferenceInfos preferenceInfos) {
-        this.preferenceInfos = preferenceInfos;
     }
 }
 

@@ -4,8 +4,8 @@ package com.SharedCheksMercadoPagoIntegration.Controllers;
 import com.SharedCheksMercadoPagoIntegration.Entities.Enums.KindOfPremium;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PayerDTO;
 import com.SharedCheksMercadoPagoIntegration.Entities.MpEntities.Preference.PreferenceDTOS.PreferenceRetunDTO;
-import com.SharedCheksMercadoPagoIntegration.Entities.SubscribeOrderPendind;
-import com.SharedCheksMercadoPagoIntegration.Repositories.SubscriptionPendingRepo;
+import com.SharedCheksMercadoPagoIntegration.Entities.PremiumOrderPendind;
+import com.SharedCheksMercadoPagoIntegration.Repositories.PremiumPendingRepo;
 import com.SharedCheksMercadoPagoIntegration.Servicies.OrdersService;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/orders")
 public class OrdersController {
     private final OrdersService ordersService;
-    private final SubscriptionPendingRepo subscriptionPendingRepo;
+    private final PremiumPendingRepo premiumPendingRepo;
 
-    public OrdersController(OrdersService ordersService, SubscriptionPendingRepo subscriptionPendingRepo) {
+    public OrdersController(OrdersService ordersService, PremiumPendingRepo premiumPendingRepo) {
         this.ordersService = ordersService;
-        this.subscriptionPendingRepo = subscriptionPendingRepo;
+        this.premiumPendingRepo = premiumPendingRepo;
     }
 
     // <>-------------- Methods --------------<>
@@ -34,10 +34,10 @@ public class OrdersController {
     public PreferenceRetunDTO cancelAndCreateNewOrder(@RequestBody PayerDTO payerDTO,
                                                       @PathVariable KindOfPremium kindOfPremium) {
         if (payerDTO.email() == null) throw new IllegalArgumentException("Email is required");
-        SubscribeOrderPendind subscribeOrderPendindFound =
-                subscriptionPendingRepo.findByEmailProfileID(payerDTO.email()).stream().findFirst().orElse(null);
+        PremiumOrderPendind premiumOrderPendindFound =
+                premiumPendingRepo.findByEmailProfileID(payerDTO.email()).stream().findFirst().orElse(null);
 
-        ordersService.cancelAndExpireNoFurtherOrder(subscribeOrderPendindFound);
+        ordersService.cancelAndExpireNoFurtherOrder(premiumOrderPendindFound);
 
         return ordersService.createOrder(payerDTO, kindOfPremium.getItemsDTO());
     }
