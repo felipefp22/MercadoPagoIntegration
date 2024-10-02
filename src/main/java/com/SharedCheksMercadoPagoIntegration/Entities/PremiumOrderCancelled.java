@@ -38,7 +38,7 @@ public class PremiumOrderCancelled {
         this.createdAtUTC = premiumOrderPendind.getCreatedAtUTC();
         this.getUpdatedExpirationAtUTC = premiumOrderPendind.getUpdatedExpirationAtUTC();
         this.value = premiumOrderPendind.getValue();
-        this.kindOfPremium = premiumOrderPendind.getKindOfSubscription();
+        this.kindOfPremium = premiumOrderPendind.getKindOfPremium();
         this.mercadoPagoID = premiumOrderPendind.getMercadoPagoID();
         this.preferenceInfos = premiumOrderPendind.getPreferenceInfos();
     }

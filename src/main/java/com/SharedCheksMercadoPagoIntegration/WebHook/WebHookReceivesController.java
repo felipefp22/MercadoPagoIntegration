@@ -49,7 +49,7 @@ public class WebHookReceivesController {
 
             if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
 
-                premiumService.movePendingSubscriptionToPaidAndActivateSubscription(subscriptionsPendind, merchantOrderDTO);
+                premiumService.movePendingpremiumToPaidAndActivatePremium(subscriptionsPendind, merchantOrderDTO);
             }
             return ResponseEntity.ok().build();
         }

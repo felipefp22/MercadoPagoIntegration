@@ -40,22 +40,22 @@ public class PremiumService {
 
     // <>-------------- Methods --------------<>
 
-    public String verifyIfHaveActiveSubscription(String email) {
+    public String verifyIfHaveActivePremium(String email) {
         verifyWithMpIfHadNewPaymentEspecificUser(email);
 
-        PremiumOrderPaidAndActive subscriptionActive = premiumPaidAndActiveRepo.findByEmailProfileID(email)
+        PremiumOrderPaidAndActive premiumActive = premiumPaidAndActiveRepo.findByEmailProfileID(email)
                 .stream().findFirst().orElse(null);
 
-        if (subscriptionActive != null && subscriptionActive.getValidTillUTC().isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
-            // Activate User subscription in main API
-            activateSubscriptionForUserMainAPI(subscriptionActive);
+        if (premiumActive != null && premiumActive.getValidTillUTC().isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
+            // Activate User premium in main API
+            activatePremiumForUserMainAPI(premiumActive);
 
             return "Desculpe pelo incoveniente, encontramos sua assinatura ativa, e já a ativamos para você!";
         } else {
-            PremiumOrderPendind subscriptionPending = premiumPendingRepo.findByEmailProfileID(email)
-                    .stream().findFirst().orElseThrow(() -> new RuntimeException("No subscription found"));
+            PremiumOrderPendind premiumPending = premiumPendingRepo.findByEmailProfileID(email)
+                    .stream().findFirst().orElseThrow(() -> new RuntimeException("No premium found"));
 
-            var externalReference = subscriptionPending.getOrderID();
+            var externalReference = premiumPending.getOrderID();
 
             MerchantOrdersThroughElementsDTO merchantOrderElements =
                     requisitionGenericMP("/merchant_orders/search?external_reference=" + externalReference.toString()
@@ -63,7 +63,7 @@ public class PremiumService {
                             new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
                             }, null);
 
-            return "No subscription found";
+            return "No premium found";
         }
     }
 
@@ -71,36 +71,36 @@ public class PremiumService {
 
 
     @Transactional
-    public void movePendingSubscriptionToPaidAndActivateSubscription(PremiumOrderPendind premiumOrderPendindPendingToChange,
-                                                                     MerchantOrderDTO merchantOrderDTO) {
-        var subscribeOrderPaidAndActiveToSave = new PremiumOrderPaidAndActive(premiumOrderPendindPendingToChange);
+    public void movePendingpremiumToPaidAndActivatePremium(PremiumOrderPendind premiumOrderPendindPendingToChange,
+                                                           MerchantOrderDTO merchantOrderDTO) {
+        var premiumOrderPaidAndActiveToSave = new PremiumOrderPaidAndActive(premiumOrderPendindPendingToChange);
 
-        subscribeOrderPaidAndActiveToSave.setStatus("PAID");
-        subscribeOrderPaidAndActiveToSave.setPaidAtUTC(
+        premiumOrderPaidAndActiveToSave.setStatus("PAID");
+        premiumOrderPaidAndActiveToSave.setPaidAtUTC(
                 takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved()));
-        subscribeOrderPaidAndActiveToSave.setValidTillUTC(
+        premiumOrderPaidAndActiveToSave.setValidTillUTC(
                 takeLocalDateTimeDatePayApprovedUTC(merchantOrderDTO.payments().stream().findFirst().orElse(null).date_approved())
-                        .plusDays(premiumOrderPendindPendingToChange.getKindOfSubscription().getDays()));
+                        .plusDays(premiumOrderPendindPendingToChange.getKindOfPremium().getDays()));
 
-        subscribeOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
+        premiumOrderPaidAndActiveToSave.setMerchantOrderFromDTO(merchantOrderDTO);
 
         // Persisting in DB
-        PremiumOrderPaidAndActive subscribeOrderToActivate = premiumPaidAndActiveRepo.save(subscribeOrderPaidAndActiveToSave);
-        premiumPendingRepo.deleteById(subscribeOrderToActivate.getOrderID());
+        PremiumOrderPaidAndActive premiumOrderToActivate = premiumPaidAndActiveRepo.save(premiumOrderPaidAndActiveToSave);
+        premiumPendingRepo.deleteById(premiumOrderToActivate.getOrderID());
 
-        // Activate User subscription in main API
-        activateSubscriptionForUserMainAPI(subscribeOrderToActivate);
+        // Activate User premium in main API
+        activatePremiumForUserMainAPI(premiumOrderToActivate);
     }
 
     public void verifyWithMpIfHadNewPaymentEspecificUser(String emailID) {
 
-        PremiumOrderPendind subscriptionsPendind =
+        PremiumOrderPendind premiumPendind =
                 premiumPendingRepo.findByEmailProfileID(emailID).stream().findFirst().orElse(null);
 
-        if (subscriptionsPendind != null) {
+        if (premiumPendind != null) {
             MerchantOrdersThroughElementsDTO merchantOrderElements =
                     requisitionGenericMP(
-                            "/merchant_orders/search?external_reference=" + subscriptionsPendind.getOrderID().toString(),
+                            "/merchant_orders/search?external_reference=" + premiumPendind.getOrderID().toString(),
                             HttpMethod.GET, null,
                             new ParameterizedTypeReference<MerchantOrdersThroughElementsDTO>() {
                             }, null);
@@ -108,17 +108,17 @@ public class PremiumService {
             MerchantOrderDTO merchantOrderDTO = merchantOrderElements.elements().stream().findFirst().orElse(null);
 
             if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
-                movePendingSubscriptionToPaidAndActivateSubscription(subscriptionsPendind, merchantOrderDTO);
+                movePendingpremiumToPaidAndActivatePremium(premiumPendind, merchantOrderDTO);
             }
         }
     }
 
-    private void activateSubscriptionForUserMainAPI(PremiumOrderPaidAndActive premiumOrderPaidAndActive) {
+    private void activatePremiumForUserMainAPI(PremiumOrderPaidAndActive premiumOrderPaidAndActive) {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("validUntillUTC", premiumOrderPaidAndActive.getValidTillUTC().toString());
         headers.put("userID", premiumOrderPaidAndActive.getEmailProfileID());
 
-        requisitionGenericSharedChecks("/internal-subscription-actions/activate-subscription",
+        requisitionGenericSharedChecks("/internal-premium-actions/activate-premium",
                 HttpMethod.POST, null,
                 new ParameterizedTypeReference<>() {
                 },
@@ -136,9 +136,9 @@ public class PremiumService {
     @Scheduled(fixedDelay = 6000000)
     public void verifyWithMpIfHadNewPayment() {
 
-        List<PremiumOrderPendind> subscriptionsPendind = premiumPendingRepo.findAll();
+        List<PremiumOrderPendind> premiumPendind = premiumPendingRepo.findAll();
 
-        subscriptionsPendind.forEach(x -> {
+        premiumPendind.forEach(x -> {
             MerchantOrdersThroughElementsDTO merchantOrderElements =
                     requisitionGenericMP("/merchant_orders/search?external_reference=" + x.getOrderID().toString(),
                             HttpMethod.GET, null,
@@ -149,7 +149,7 @@ public class PremiumService {
 
             if (merchantOrderDTO.payments().stream().findFirst().orElse(null).status().equals("approved")) {
 
-                movePendingSubscriptionToPaidAndActivateSubscription(x, merchantOrderDTO);
+                movePendingpremiumToPaidAndActivatePremium(x, merchantOrderDTO);
             }
         });
     }
@@ -157,17 +157,17 @@ public class PremiumService {
 
     @Scheduled(fixedDelay = 21600000)
     @Transactional
-    public void takingOutExpiredSubscriptions() {
-        List<PremiumOrderPaidAndActive> subscriptionPaidRepo = premiumPaidAndActiveRepo.findAll();
+    public void takingOutExpiredPremium() {
+        List<PremiumOrderPaidAndActive> premiumPaidRepo = premiumPaidAndActiveRepo.findAll();
 
-        subscriptionPaidRepo.forEach(x -> {
+        premiumPaidRepo.forEach(x -> {
             if (x.getValidTillUTC().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
                 x.setStatus("PAIDANDEXPIRED");
-                var subscriptionPaidAndExpiredSaved = premiumPaidAndExpiredRepo.save(new PremiumOrderPaidAndExpired(x));
-                premiumPaidAndActiveRepo.deleteById(subscriptionPaidAndExpiredSaved.getOrderID());
+                var premiumPaidAndExpiredSaved = premiumPaidAndExpiredRepo.save(new PremiumOrderPaidAndExpired(x));
+                premiumPaidAndActiveRepo.deleteById(premiumPaidAndExpiredSaved.getOrderID());
 
-                // Deactivate User subscription in main API
-//                requisitionGenericSharedChecks("/internal-subscription-actions/deactivate-subscription",
+                // Deactivate User premium in main API
+//                requisitionGenericSharedChecks("/internal-premium-actions/deactivate-premium",
 //                        HttpMethod.DELETE, null,
 //                        new ParameterizedTypeReference<Object>() {
 //                        }, null);

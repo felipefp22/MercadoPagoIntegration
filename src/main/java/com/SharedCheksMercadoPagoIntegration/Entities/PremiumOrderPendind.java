@@ -79,7 +79,7 @@ public class PremiumOrderPendind {
         return value;
     }
 
-    public KindOfPremium getKindOfSubscription() {
+    public KindOfPremium getKindOfPremium() {
         return kindOfPremium;
     }
 

@@ -108,7 +108,7 @@ public class OrdersService {
                         },
                         null);
 
-        if (premiumOrderPendindFound.getKindOfSubscription().getItemsDTO() == itemsDTO) {
+        if (premiumOrderPendindFound.getKindOfPremium().getItemsDTO() == itemsDTO) {
 
             premiumOrderPendindFound.setUpdatedExpirationAtUTC(LocalDateTime.now(ZoneOffset.UTC));
 

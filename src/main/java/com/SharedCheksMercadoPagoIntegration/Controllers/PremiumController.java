@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/verify-subscription")
+@RequestMapping("/verify-premium")
 public class PremiumController {
     private final PremiumService premiumService;
 
@@ -17,10 +17,10 @@ public class PremiumController {
 
     // <>-------------- Methods --------------<>
 
-    @GetMapping("/verify-if-have-active-subscription/{email}")
-    public String verifyIfHaveActiveSubscription(@PathVariable String email) {
+    @GetMapping("/verify-if-have-active-premium/{email}")
+    public String verifyIfHaveActivePremium(@PathVariable String email) {
 
-        return premiumService.verifyIfHaveActiveSubscription(email);
+        return premiumService.verifyIfHaveActivePremium(email);
     }
 
 }
