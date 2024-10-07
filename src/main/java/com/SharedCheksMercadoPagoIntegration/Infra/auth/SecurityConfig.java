@@ -26,14 +26,10 @@ public class SecurityConfig {
     @Value("${oauth.jwt.secret}")
     private String secret;
     private final SecurityFilter securityFilter;
-    private final AuthUserRepository authUserRepository;
-    private final TokenServiceOur tokenServiceOur;
 
     @Autowired
-    public SecurityConfig(SecurityFilter securityFilter, AuthUserRepository authUserRepository, TokenServiceOur tokenServiceOur) {
+    public SecurityConfig(SecurityFilter securityFilter) {
         this.securityFilter = securityFilter;
-        this.authUserRepository = authUserRepository;
-        this.tokenServiceOur = tokenServiceOur;
     }
 
     @Bean
@@ -49,6 +45,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/orders/cancel-and-create-new-order/{kindOfPremium}").hasRole("ADMIN");
                     // Premium
                     auth.requestMatchers("/verify-premium/verify-if-have-active-premium/{email}").hasRole("ADMIN");
+                    auth.requestMatchers("/webhook-receives/mp-payments").permitAll();
+
 
                     auth.anyRequest().hasRole("USER");
                 })

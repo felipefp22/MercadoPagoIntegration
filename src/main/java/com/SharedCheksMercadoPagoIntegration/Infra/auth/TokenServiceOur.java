@@ -25,7 +25,7 @@ public class TokenServiceOur {
 
             String token = JWT.create()
                     .withIssuer("prev")
-                    .withSubject(authUserLogin.getEmail())
+                    .withSubject(authUserLogin.getUsername())
                     .withClaim("username", authUserLogin.getUsername())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);

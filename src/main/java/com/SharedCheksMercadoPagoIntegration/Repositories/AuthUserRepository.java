@@ -14,10 +14,5 @@ public interface AuthUserRepository extends JpaRepository<AuthUserLogin, String>
 
     Optional<AuthUserLogin> findByUsernameIgnoreCase(String username);
 
-    Optional<List<AuthUserLogin>> findByEmailContainingIgnoreCase(String searchString);
-
     Optional<List<AuthUserLogin>> findByUsernameContainingIgnoreCase(String searchString);
-
-    Optional<List<AuthUserLogin>> findByUserDatas_CrmContainingIgnoreCase(String searchString);
-
 }

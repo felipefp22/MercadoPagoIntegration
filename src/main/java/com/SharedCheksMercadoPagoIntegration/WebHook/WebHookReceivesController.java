@@ -32,9 +32,7 @@ public class WebHookReceivesController {
 
     @PostMapping("/mp-payments")
     public ResponseEntity receiveMpPayments(@RequestBody WebHookDTO webHookDTO) {
-
-        System.out.println(webHookDTO.toString());
-
+        
         if (webHookDTO.status().equals("closed")) {
             MerchantOrderDTO merchantOrderDTO =
                     requisitionGenericMP("/merchant_orders/" + webHookDTO.id(),
